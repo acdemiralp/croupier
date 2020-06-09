@@ -9,8 +9,8 @@
 #include <croupier/card/card_set_ops.hpp>
 #include <croupier/evaluator/equivalence_class.hpp>
 #include <croupier/evaluator/hand_evaluation.hpp>
+#include <croupier/game/table.hpp>
 #include <croupier/ruleset/ruleset.hpp>
-#include <croupier/table.hpp>
 
 namespace cro
 {
@@ -18,12 +18,10 @@ class evaluator
 {
 public:
   evaluator           (ruleset* ruleset, table* table)
-  : ruleset_              (ruleset)
-  , table_                (table  )
-  , rank_masks_           (make_rank_masks    ())
-  , suit_masks_           (make_suit_masks    ())
-  , straight_masks_       (make_straight_masks())
-  , equivalence_class_map_(make_equivalence_class_map(ruleset_->ranking_type))
+  : ruleset_            (ruleset)
+  , table_              (table)
+  , suit_masks_         (make_suit_masks())
+  , equivalence_classes_(make_equivalence_classes(ruleset_->ranking_type))
   {
     
   }
@@ -51,7 +49,7 @@ public:
     auto combinations = make_combinations(cards, community_cards);
     auto evaluation   = hand_evaluation {hand_type::high_card, std::numeric_limits<std::uint16_t>::max()}; // TODO: Distinguish traditional/lowball/highlow. TODO: Equivalency tables for 2/3/4 (open) cards?
     for (auto& combination : combinations)
-      evaluation = std::min(evaluation, equivalence_class_map_.at(compute_equivalence_key(combination)));
+      evaluation = std::min(evaluation, equivalence_classes_.at(compute_equivalence_key(combination)));
     return evaluation;
   }
 
@@ -77,12 +75,10 @@ protected:
     return key;
   }
 
-  ruleset*                                          ruleset_              ;
-  table*                                            table_                ;
-  std::vector<card_set>                             rank_masks_           ;
-  std::vector<card_set>                             suit_masks_           ;
-  std::vector<std::bitset<13>>                      straight_masks_       ;
-  std::unordered_map<std::int32_t, hand_evaluation> equivalence_class_map_;
+  ruleset*                                          ruleset_            ;
+  table*                                            table_              ;
+  std::vector<card_set>                             suit_masks_         ;
+  std::unordered_map<std::int32_t, hand_evaluation> equivalence_classes_;
 };
 }
 

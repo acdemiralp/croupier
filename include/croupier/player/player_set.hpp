@@ -1,7 +1,6 @@
 #ifndef CROUPIER_PLAYER_PLAYER_SET_HPP
 #define CROUPIER_PLAYER_PLAYER_SET_HPP
 
-#include <bit>
 #include <cstddef>
 #include <string>
 

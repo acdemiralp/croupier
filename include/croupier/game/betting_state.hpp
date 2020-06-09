@@ -1,5 +1,5 @@
-#ifndef CROUPIER_BETTING_STATE_HPP
-#define CROUPIER_BETTING_STATE_HPP
+#ifndef CROUPIER_GAME_BETTING_STATE_HPP
+#define CROUPIER_GAME_BETTING_STATE_HPP
 
 #include <cstddef>
 #include <cstdint>

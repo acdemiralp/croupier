@@ -2,6 +2,5 @@
 
 int main(int argc, char** argv)
 {
-  auto map = cro::compute_traditional_equivalence_class_map();
-
+  auto map = cro::make_equivalence_classes();
 }

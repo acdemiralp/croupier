@@ -1,21 +1,21 @@
-#ifndef CROUPIER_DEALER_HPP
-#define CROUPIER_DEALER_HPP
+#ifndef CROUPIER_GAME_DEALER_HPP
+#define CROUPIER_GAME_DEALER_HPP
 
 #include <limits>
 #include <stdexcept>
 #include <vector>
 
 #include <croupier/ruleset/ruleset.hpp>
-#include <croupier/betting_state.hpp>
-#include <croupier/round.hpp>
-#include <croupier/table.hpp>
+#include <croupier/game/betting_state.hpp>
+#include <croupier/game/event.hpp>
+#include <croupier/game/table.hpp>
 
 namespace cro
 {
 class dealer
 {
 public:
-  dealer           (ruleset* ruleset, table* table, std::vector<round>* history) : ruleset_(ruleset), table_(table), history_(history)
+  dealer           (ruleset* ruleset, table* table, std::vector<std::vector<event>>* history) : ruleset_(ruleset), table_(table), history_(history)
   {
 
   }

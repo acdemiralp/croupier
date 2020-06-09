@@ -5,7 +5,6 @@
 #include <unordered_map>
 
 #include <croupier/card/rank.hpp>
-#include <croupier/evaluator/equivalence_class_data.hpp>
 #include <croupier/evaluator/hand_evaluation.hpp>
 #include <croupier/ruleset/detail/ranking_type.hpp>
 
@@ -22,30 +21,14 @@ namespace cro
 // which ensures each rank is represented independent of one another. The product is further
 // independent on the order of the cards, which removes the need for sorting. Flushes are identified
 // through negation instead of an additional prime to ensure fitting into the range of a 32-bit integer.
-inline std::unordered_map<std::int32_t, hand_evaluation> make_equivalence_class_map               (const ranking_type& ranking_type = ranking_type::traditional)
+inline std::unordered_map<std::int32_t, hand_evaluation> make_equivalence_classes(const ranking_type ranking_type = ranking_type::traditional)
 {
-  auto equivalence_class_map = std::unordered_map<std::int32_t, hand_evaluation>();
+  // TODO: Support other ranking types.
 
-  for (auto i = std::uint16_t(0); i < equivalence_class_data.size(); ++i)
-  {
-    auto type = hand_type_from_string(equivalence_class_data[i][1]);
-    auto key  = type == hand_type::flush || type == hand_type::straight_flush ? -1 : 1;
-    for (auto& character : equivalence_class_data[i][0])
-      key *= rank_to_prime(rank_from_char(character));
-    equivalence_class_map[key] = hand_evaluation {type, i};
-  }
-
-  // TODO: Re-sort the equivalence classes according to ranking_type; adding support for ace_to_five_low, ace_to_five_high_low, ace_to_six_low, ace_to_six_high_low, badugi.
-
-  return equivalence_class_map;
-};
-
-std::unordered_map<std::int32_t, hand_evaluation>        compute_traditional_equivalence_class_map()
-{
   auto map = std::unordered_map<std::int32_t, hand_evaluation>();
 
   // Generate straight flushes.
-  for (std::int32_t r1 = rank_count() - 1; r1 >= 5; --r1)
+  for (std::int32_t r1 = rank_count() - 1; r1 >= 3; --r1)
   {
     auto key = -rank_to_prime(rank(r1)) * rank_to_prime(rank(r1 - 1)) * rank_to_prime(rank(r1 - 2)) * rank_to_prime(rank(r1 - 3)) * rank_to_prime(rank(r1 - 4 >= 0 ? r1 - 4 : rank_count() - 1));
 
@@ -123,7 +106,7 @@ std::unordered_map<std::int32_t, hand_evaluation>        compute_traditional_equ
   }
 
   // Generate straights.
-  for (std::int32_t r1 = rank_count() - 1; r1 >= 5; --r1)
+  for (std::int32_t r1 = rank_count() - 1; r1 >= 3; --r1)
   {
     auto key = rank_to_prime(rank(r1)) * rank_to_prime(rank(r1 - 1)) * rank_to_prime(rank(r1 - 2)) * rank_to_prime(rank(r1 - 3)) * rank_to_prime(rank(r1 - 4 >= 0 ? r1 - 4 : rank_count() - 1));
 

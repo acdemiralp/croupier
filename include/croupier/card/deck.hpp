@@ -1,5 +1,5 @@
-#ifndef CROUPIER_DECK_HPP
-#define CROUPIER_DECK_HPP
+#ifndef CROUPIER_CARD_DECK_HPP
+#define CROUPIER_CARD_DECK_HPP
 
 #include <deque>
 #include <functional>

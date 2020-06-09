@@ -7,7 +7,7 @@
 #include <optional>
 
 #include <croupier/card/card_set.hpp>
-#include <croupier/action.hpp>
+#include <croupier/game/action.hpp>
 
 namespace cro
 {

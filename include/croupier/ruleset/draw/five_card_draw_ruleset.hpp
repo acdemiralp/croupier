@@ -23,17 +23,9 @@ return ruleset
     stage::betting_from_left_of_the_button,
     stage::showdown
   },
-  std::nullopt               ,
-  std::nullopt               ,
-  2                          ,
-  limit_type::no_limit       ,
-  std::nullopt               ,
-  std::nullopt               ,
-  make_default_hand_ranking(),
-  ranking_type::normal       ,
-  ace_rule::any              ,
-  5                          ,
-  std::nullopt                
+  std::nullopt,
+  std::nullopt,
+  blinds {1, 2}            
 };
 }
 }
