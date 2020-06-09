@@ -6,11 +6,11 @@
 #include <optional>
 #include <vector>
 
-#include <croupier/ruleset/detail/blinds.hpp>
-#include <croupier/ruleset/detail/limit_type.hpp>
-#include <croupier/ruleset/detail/limits.hpp>
-#include <croupier/ruleset/detail/ranking_type.hpp>
-#include <croupier/ruleset/detail/stage.hpp>
+#include <croupier/ruleset/blinds.hpp>
+#include <croupier/ruleset/limit_type.hpp>
+#include <croupier/ruleset/limits.hpp>
+#include <croupier/ruleset/ranking_type.hpp>
+#include <croupier/ruleset/stage.hpp>
 
 namespace cro
 {

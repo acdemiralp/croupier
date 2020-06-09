@@ -6,7 +6,7 @@
 
 #include <croupier/card/rank.hpp>
 #include <croupier/evaluator/hand_evaluation.hpp>
-#include <croupier/ruleset/detail/ranking_type.hpp>
+#include <croupier/ruleset/ranking_type.hpp>
 
 namespace cro
 {
