@@ -1,0 +1,2 @@
+# croupier
+A poker engine.
