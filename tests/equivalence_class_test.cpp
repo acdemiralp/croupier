@@ -1,6 +1,6 @@
-#include <croupier/evaluator/equivalence_class.hpp>
+#include <croupier/evaluator/equivalences.hpp>
 
 int main(int argc, char** argv)
 {
-  auto map = cro::make_four_card_equivalence_classes();
+  auto map = cro::make_equivalences();
 }

@@ -200,6 +200,8 @@ public:
                                        
   std::vector<card_set> combinations   (const std::size_t k) const
   {
+    if (k > bitset_.count()) return { *this };
+
     auto combinations = std::vector<card_set>();
     auto selector     = std::vector<bool>(bitset_.count());
     auto split_cards  = cards();

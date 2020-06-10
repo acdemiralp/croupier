@@ -16,7 +16,7 @@ struct hand_evaluation
   }
   bool operator==(const hand_evaluation& that) const
   {
-    return type == that.type && equivalence_class < that.equivalence_class;
+    return equivalence_class == that.equivalence_class;
   }
 
   hand_type     type;
