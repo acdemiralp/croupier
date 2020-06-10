@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <vector>
 
+#include <croupier/evaluator/evaluator.hpp>
 #include <croupier/ruleset/ruleset.hpp>
 #include <croupier/game/betting_state.hpp>
 #include <croupier/game/event.hpp>
@@ -12,10 +13,10 @@
 
 namespace cro
 {
-class dealer
+class dealer : public evaluator
 {
 public:
-  dealer           (ruleset* ruleset, table* table, std::vector<std::vector<event>>* history) : ruleset_(ruleset), table_(table), history_(history)
+  dealer           (ruleset* ruleset, table* table, std::vector<std::vector<event>>* history) : evaluator(ruleset, table), ruleset_(ruleset), table_(table), history_(history)
   {
 
   }
@@ -298,9 +299,9 @@ protected:
     table_->fixed_limit_    .reset  ();
   }
 
-  ruleset*            ruleset_;
-  table*              table_  ;
-  std::vector<round>* history_;
+  ruleset*                         ruleset_;
+  table*                           table_  ;
+  std::vector<std::vector<event>>* history_;
 };
 }
 
