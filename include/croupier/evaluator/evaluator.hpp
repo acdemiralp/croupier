@@ -7,7 +7,7 @@
 #include <vector>
 
 #include <croupier/card/card_set_ops.hpp>
-#include <croupier/evaluator/equivalence_class.hpp>
+#include <croupier/evaluator/equivalences.hpp>
 #include <croupier/evaluator/hand_evaluation.hpp>
 #include <croupier/game/table.hpp>
 #include <croupier/ruleset/ruleset.hpp>
@@ -18,10 +18,9 @@ class evaluator
 {
 public:
   evaluator           (ruleset* ruleset, table* table)
-  : ruleset_            (ruleset)
-  , table_              (table)
-  , suit_masks_         (make_suit_masks())
-  , equivalence_classes_(make_equivalence_classes(ruleset_->ranking_type))
+  : ruleset_     (ruleset)
+  , table_       (table)
+  , equivalences_(make_equivalences())
   {
     
   }
@@ -31,7 +30,7 @@ public:
   evaluator& operator=(const evaluator&  that) = default;
   evaluator& operator=(      evaluator&& temp) = default;
 
-  std::vector<hand_evaluation> evaluate(bool open_cards_only = false) const
+  std::vector<hand_evaluation> evaluate               (bool open_cards_only = false) const
   {
     auto scores = std::vector<hand_evaluation>(table_->players_.size());
     table_->active_players_.iterate([&] (const std::size_t index)
@@ -43,24 +42,23 @@ public:
     });
     return scores;
   }
-
-  hand_evaluation              evaluate(const card_set& cards, std::optional<card_set> community_cards = std::nullopt) const
+  hand_evaluation              evaluate               (const card_set& cards, std::optional<card_set> community_cards = std::nullopt) const
   {
     auto combinations = make_combinations(cards, community_cards);
     auto evaluation   = hand_evaluation {hand_type::high_card, std::numeric_limits<std::uint16_t>::max()}; // TODO: Distinguish traditional/lowball/highlow. TODO: Equivalency tables for 2/3/4 (open) cards?
     for (auto& combination : combinations)
-      evaluation = std::min(evaluation, equivalence_classes_.at(compute_equivalence_key(combination)));
+      evaluation = std::min(evaluation, equivalences_.at(ruleset_->ranking_type).at(combination.count()).at(compute_equivalence_key(combination)));
     return evaluation;
   }
 
 protected:
-  std::vector<card_set> make_combinations      (const card_set& cards, std::optional<card_set> community_cards) const
+  std::vector<card_set>        make_combinations      (const card_set& cards, std::optional<card_set> community_cards) const
   {
     if (ruleset_->evaluated_community_cards)
       return community_cards->combinations(*ruleset_->evaluated_community_cards) | cards.combinations(ruleset_->evaluated_cards - *ruleset_->evaluated_community_cards);
     return (community_cards ? cards | *community_cards : cards).combinations(ruleset_->evaluated_cards);
   }
-  std::int32_t          compute_equivalence_key(const card_set& cards) const
+  std::int32_t                 compute_equivalence_key(const card_set& cards) const
   {
     auto key = std::int32_t(1);
 
@@ -68,17 +66,16 @@ protected:
     for (auto& card : split)
       key *= rank_to_prime(card.rank());    // Multiply the prime of each card rank in card_set.
 
-    for (auto& suit_mask : suit_masks_)
+    for (auto& suit_mask : suit_masks)
       if ((cards & suit_mask).count() == 5) // If the card_set is a flush, negate.
         key *= -1;
 
     return key;
   }
 
-  ruleset*                                          ruleset_            ;
-  table*                                            table_              ;
-  std::vector<card_set>                             suit_masks_         ;
-  std::unordered_map<std::int32_t, hand_evaluation> equivalence_classes_;
+  ruleset*     ruleset_     ;
+  table*       table_       ;
+  equivalences equivalences_;
 };
 }
 

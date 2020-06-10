@@ -41,6 +41,10 @@ inline std::vector<std::bitset<13>> make_straight_masks()
   }
   return straight_masks;
 }
+
+inline std::vector<card_set>        rank_masks     = make_rank_masks    ();
+inline std::vector<card_set>        suit_masks     = make_suit_masks    ();
+inline std::vector<std::bitset<13>> straight_masks = make_straight_masks();
 }
 
 #endif

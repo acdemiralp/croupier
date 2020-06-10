@@ -26,7 +26,7 @@ public:
   dealer& operator=(const dealer&  that) = default;
   dealer& operator=(      dealer&& temp) = default;
 
-  void play                                 ()
+  void play                                   () const
   {
     initialize  ();
     apply_stages();
@@ -34,7 +34,7 @@ public:
   }
 
 protected:
-  void initialize                           () const
+  void initialize                             () const
   {
     // Set players with sufficient funds to active.
     const auto minimum_chips = (ruleset_->ante ? ruleset_->ante.value() : 0ull) + (ruleset_->blinds ? ruleset_->blinds->big_blind : 0ull);
@@ -57,28 +57,28 @@ protected:
     if (ruleset_->limit_type == limit_type::fixed_limit)
       table_->fixed_limit_ = ruleset_->fixed_limits->small_bet;
   }
-  void apply_stages                         ()
+  void apply_stages                           () const
   {
     for (auto& stage : ruleset_->stages)
     {
       if (stage == stage::ante                             ) apply_ante                             ();
       if (stage == stage::betting_from_left_of_the_button  ) apply_betting_from_left_of_the_button  ();
       if (stage == stage::betting_from_left_of_big_blind   ) apply_betting_from_left_of_big_blind   ();
-      if (stage == stage::betting_from_left_of_lowest_open ) apply_betting_from_left_of_lowest_open (); // Requires eval.
-      if (stage == stage::betting_from_left_of_highest_open) apply_betting_from_left_of_highest_open(); // Requires eval.
+      if (stage == stage::betting_from_left_of_lowest_open ) apply_betting_from_left_of_lowest_open ();
+      if (stage == stage::betting_from_left_of_highest_open) apply_betting_from_left_of_highest_open();
       if (stage == stage::blind                            ) apply_blind                            ();
-      if (stage == stage::bring_in_from_lowest_open        ) apply_bring_in_from_lowest_open        (); // Requires eval.
-      if (stage == stage::bring_in_from_highest_open       ) apply_bring_in_from_highest_open       (); // Requires eval.
+      if (stage == stage::bring_in_from_lowest_open        ) apply_bring_in_from_lowest_open        ();
+      if (stage == stage::bring_in_from_highest_open       ) apply_bring_in_from_highest_open       ();
       if (stage == stage::burn_card                        ) apply_burn_card                        ();
       if (stage == stage::deal_closed_card                 ) apply_deal_closed_card                 ();
       if (stage == stage::deal_community_card              ) apply_deal_community_card              ();
       if (stage == stage::deal_open_card                   ) apply_deal_open_card                   ();
       if (stage == stage::deal_replacement_cards           ) apply_deal_replacement_cards           ();
       if (stage == stage::increase_limit                   ) apply_increase_limit                   ();
-      if (stage == stage::showdown                         ) apply_showdown                         (); // Requires eval.
+      if (stage == stage::showdown                         ) apply_showdown                         ();
     }
   }
-  void apply_ante                           () const
+  void apply_ante                             () const
   {
     const auto amount = ruleset_->ante.value_or(0);
     table_->active_players_.iterate([&] (const std::size_t index)
@@ -88,7 +88,7 @@ protected:
     });
     history_->back().push_back(event {event_type::ante, table_->active_players_, std::nullopt, amount});
   }
-  void apply_betting                        (const std::size_t start) const
+  void apply_betting                          (const std::size_t start) const
   {
     auto state = betting_state(table_->active_players_);
     auto index = start;
@@ -190,14 +190,14 @@ protected:
       table_->pots_[players] += total;
     }
   }
-  void apply_betting_from_left_of_the_button() const
+  void apply_betting_from_left_of_the_button  () const
   {
     const auto  small_blind_index = table_->active_players_.find_next_circular(table_->button_player_.find_first());
     const auto& player            = table_->players_[small_blind_index];
     history_->back().push_back(event {event_type::betting_from_left_of_the_button, player_set(player)});
     apply_betting(small_blind_index);
   }
-  void apply_betting_from_left_of_big_blind () const
+  void apply_betting_from_left_of_big_blind   () const
   {
     const auto  small_blind_index       = table_->active_players_.find_next_circular(table_->button_player_.find_first());
     const auto  big_blind_index         = table_->active_players_.find_next_circular(small_blind_index);
@@ -206,7 +206,15 @@ protected:
     history_->back().push_back(event {event_type::betting_from_left_of_big_blind, player_set(player)});
     apply_betting(left_of_big_blind_index);
   }
-  void apply_blind                          () const
+  void apply_betting_from_left_of_lowest_open () const
+  {
+    // TODO
+  }
+  void apply_betting_from_left_of_highest_open() const
+  {
+    // TODO
+  }
+  void apply_blind                            () const
   {
     const auto small_blind_index  = table_->active_players_.find_next_circular(table_->button_player_.find_first());
     const auto small_blind_amount = ruleset_->blinds ? ruleset_->blinds->small_blind : 0;
@@ -220,12 +228,20 @@ protected:
     table_->pots_[table_->active_players_]    += big_blind_amount;
     history_->back().push_back(event {event_type::blind, player_set(table_->players_[big_blind_index]), std::nullopt, big_blind_amount});
   }
-  void apply_burn_card                      () const
+  void apply_bring_in_from_lowest_open        () const
+  {
+    // TODO
+  }
+  void apply_bring_in_from_highest_open       () const
+  {
+    // TODO
+  }
+  void apply_burn_card                        () const
   {
     const auto card = table_->deck_.draw();
     history_->back().push_back(event {event_type::burn_card, std::nullopt, card_set(card)});
   }
-  void apply_deal_closed_card               () const
+  void apply_deal_closed_card                 () const
   {
     const auto small_blind_index = table_->active_players_.find_next_circular(table_->button_player_.find_first());
     table_->active_players_.iterate_circular(small_blind_index, [&] (const std::size_t index)
@@ -236,13 +252,13 @@ protected:
       history_->back().push_back(event {event_type::deal_closed_card, player_set(player), card_set(card)});
     });
   }
-  void apply_deal_community_card            () const
+  void apply_deal_community_card              () const
   {
     const auto card = table_->deck_.draw();
     table_->community_cards_.insert(card);
     history_->back().push_back(event {event_type::deal_community_card, std::nullopt, card_set(card)});
   }
-  void apply_deal_open_card                 () const
+  void apply_deal_open_card                   () const
   {
     const auto small_blind_index = table_->active_players_.find_next_circular(table_->button_player_.find_first());
     table_->active_players_.iterate_circular(small_blind_index, [&] (const std::size_t index)
@@ -253,7 +269,7 @@ protected:
       history_->back().push_back(event {event_type::deal_open_card, player_set(player), card_set(card)});
     });
   }
-  void apply_deal_replacement_cards         () const
+  void apply_deal_replacement_cards           () const
   {
     const auto small_blind_index = table_->active_players_.find_next_circular(table_->button_player_.find_first());
     table_->active_players_.iterate_circular(small_blind_index, [&] (const std::size_t index)
@@ -279,12 +295,16 @@ protected:
       history_->back().push_back(event {event_type::deal_replacement_cards, player_set(player), added_closed_cards | added_open_cards });
     });
   }
-  void apply_increase_limit                 () const
+  void apply_increase_limit                   () const
   {
     table_->fixed_limit_ = ruleset_->fixed_limits->big_bet;
     history_->back().push_back(event {event_type::increase_limit, std::nullopt, std::nullopt, ruleset_->fixed_limits->big_bet});
   }
-  void finalize                             () const
+  void apply_showdown                         () const
+  {
+    // TODO
+  }
+  void finalize                               () const
   {
     for (auto& player : table_->players_)
     {
