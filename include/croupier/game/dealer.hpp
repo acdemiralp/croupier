@@ -56,6 +56,9 @@ protected:
     // If fixed limit applies, set current limit to small bet.
     if (ruleset_->limit_type == limit_type::fixed_limit)
       table_->fixed_limit_ = ruleset_->fixed_limits->small_bet;
+
+    // Create log for the round.
+    history_->emplace_back();
   }
   void apply_stages                           () const
   {
@@ -164,7 +167,7 @@ protected:
         history_->back().push_back(event {event_type::fold , player_set(player)});
       }
 
-      index = table_->active_players_.find_next(index);
+      index = table_->active_players_.find_next_circular(index);
     }
 
     while (!std::all_of(state.bet_amounts.begin(), state.bet_amounts.end(), [ ] (const std::uint64_t value) { return value == 0; }))
@@ -369,6 +372,8 @@ protected:
         });
       }
     }
+
+    history_->back().push_back(event {event_type::showdown, table_->active_players_});
   }
   void finalize                               () const
   {

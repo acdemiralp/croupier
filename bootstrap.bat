@@ -9,7 +9,7 @@ if not exist "vcpkg.exe" call bootstrap-vcpkg.bat
 set VCPKG_COMMAND=vcpkg install --recurse
 set VCPKG_DEFAULT_TRIPLET=x64-windows
 rem Add your library ports here.
-%VCPKG_COMMAND% boost-dynamic-bitset boost-integer boost-functional magic-enum
+%VCPKG_COMMAND% boost-dynamic-bitset boost-integer boost-functional boost-move magic-enum
 cd ..
 
 cmake -Ax64 -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake ..

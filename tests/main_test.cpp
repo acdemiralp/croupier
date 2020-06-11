@@ -9,7 +9,7 @@ int main(int argc, char** argv)
     [ ] (cro::player* player, cro::table* table, const cro::betting_state& state)
     {
       // TODO: Implement smarter decision function here.
-      return cro::action { cro::action_type::fold };
+      return cro::action { cro::action_type::check };
     },
     [ ] (cro::player* player, cro::table* table, std::optional<std::size_t> maximum_cards)
     {
