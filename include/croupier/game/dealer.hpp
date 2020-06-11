@@ -315,12 +315,59 @@ protected:
         ruleset_->ranking_type == ranking_type::deuce_to_seven_high_low)
     {
       const auto evaluations = evaluate_high_low();
-      // TODO: Find the winner(s) of each pot, and distribute the chips.
+      for (auto& pot : table_->pots_)
+      {
+        const auto valid_players = pot.first & table_->active_players_;
+
+        auto best_evaluation  = evaluations[valid_players.find_first()][0];
+        auto worst_evaluation = evaluations[valid_players.find_first()][1];
+        valid_players.iterate([&] (const std::size_t index)
+        {
+          if (evaluations[index][0] < best_evaluation ) best_evaluation  = evaluations[index][0];
+          if (evaluations[index][1] > worst_evaluation) worst_evaluation = evaluations[index][1];
+        });
+
+        auto winner_count = std::size_t(0);
+        valid_players.iterate([&] (const std::size_t index)
+        {
+          if (evaluations[index][0] == best_evaluation || evaluations[index][1] == worst_evaluation) 
+            winner_count++;
+        });
+
+        valid_players.iterate([&] (const std::size_t index)
+        {
+          if (evaluations[index][0] == best_evaluation || evaluations[index][1] == worst_evaluation)
+            table_->players_[index].chips += pot.second / winner_count;
+        });
+      }
     }
     else
     {
       const auto evaluations = evaluate();
-      // TODO: Find the winner(s) of each pot, and distribute the chips.
+      for (auto& pot : table_->pots_)
+      {
+        const auto valid_players = pot.first & table_->active_players_;
+
+        auto best_evaluation = evaluations[valid_players.find_first()];
+        valid_players.iterate([&] (const std::size_t index)
+        {
+          if (evaluations[index] < best_evaluation)
+            best_evaluation = evaluations[index];
+        });
+
+        auto winner_count = std::size_t(0);
+        valid_players.iterate([&] (const std::size_t index)
+        {
+          if (evaluations[index] == best_evaluation) 
+            winner_count++;
+        });
+
+        valid_players.iterate([&] (const std::size_t index)
+        {
+          if (evaluations[index] == best_evaluation)
+            table_->players_[index].chips += pot.second / winner_count;
+        });
+      }
     }
   }
   void finalize                               () const
