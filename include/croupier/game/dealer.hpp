@@ -61,18 +61,21 @@ protected:
   {
     for (auto& stage : ruleset_->stages)
     {
-      if (stage == stage::ante                           ) apply_ante                             ();
-      if (stage == stage::betting_from_left_of_the_button) apply_betting_from_left_of_the_button  ();
-      if (stage == stage::betting_from_best_open         ) apply_betting_from_best_open           ();
-      if (stage == stage::blind                          ) apply_blind                            ();
-      if (stage == stage::bring_in                       ) apply_bring_in                         ();
-      if (stage == stage::burn_card                      ) apply_burn_card                        ();
-      if (stage == stage::deal_closed_card               ) apply_deal_closed_card                 ();
-      if (stage == stage::deal_community_card            ) apply_deal_community_card              ();
-      if (stage == stage::deal_open_card                 ) apply_deal_open_card                   ();
-      if (stage == stage::deal_replacement_cards         ) apply_deal_replacement_cards           ();
-      if (stage == stage::increase_limit                 ) apply_increase_limit                   ();
-      if (stage == stage::showdown                       ) apply_showdown                         ();
+      auto early_terminate = false;
+      if (stage == stage::ante                           )                   apply_ante                             ();
+      if (stage == stage::betting_from_left_of_the_button) early_terminate = apply_betting_from_left_of_the_button  ();
+      if (stage == stage::betting_from_best_open         ) early_terminate = apply_betting_from_best_open           ();
+      if (stage == stage::blind                          ) early_terminate = apply_blind                            ();
+      if (stage == stage::bring_in                       ) early_terminate = apply_bring_in                         ();
+      if (stage == stage::burn_card                      )                   apply_burn_card                        ();
+      if (stage == stage::deal_closed_card               )                   apply_deal_closed_card                 ();
+      if (stage == stage::deal_community_card            )                   apply_deal_community_card              ();
+      if (stage == stage::deal_open_card                 )                   apply_deal_open_card                   ();
+      if (stage == stage::deal_replacement_cards         )                   apply_deal_replacement_cards           ();
+      if (stage == stage::increase_limit                 )                   apply_increase_limit                   ();
+      if (stage == stage::showdown                       )                   apply_showdown                         ();
+      if (early_terminate)
+        break;
     }
   }
   void apply_ante                             () const
@@ -85,7 +88,7 @@ protected:
     });
     history_->back().push_back(event {event_type::ante, table_->active_players_, std::nullopt, amount});
   }
-  void apply_betting                          (const std::size_t start) const
+  bool apply_betting                          (const std::size_t start) const
   {
     auto state = betting_state(table_->active_players_);
     auto index = start;
@@ -186,21 +189,35 @@ protected:
       }
       table_->pots_[players] += total;
     }
+
+    // If only one player is active in any pot, that player takes that pot.
+    for (auto it = table_->pots_.begin(); it != table_->pots_.end(); )
+    {
+      if ((it->first & table_->active_players_).count() == 1)
+      {
+        table_->players_[table_->active_players_.find_first()].chips += it->second;
+        it = table_->pots_.erase(it);
+      }
+      else
+        ++it;
+    }
+
+    return table_->active_players_.count() == 1; // If only one player is active, the game early terminates.
   }
-  void apply_betting_from_left_of_the_button  () const
+  bool apply_betting_from_left_of_the_button  () const
   {
     const auto small_blind_index = table_->active_players_.find_next_circular(table_->button_player_.find_first());
     history_->back().push_back(event {event_type::betting_from_left_of_the_button, player_set(table_->players_[small_blind_index])});
-    apply_betting(small_blind_index);
+    return apply_betting(small_blind_index);
   }
-  void apply_betting_from_best_open           () const
+  bool apply_betting_from_best_open           () const
   {
     const auto evaluations  = evaluate(true);
     const auto player_index = std::distance(evaluations.begin(), std::min_element(evaluations.begin(), evaluations.end()));
     history_->back().push_back(event {event_type::betting_from_best_open, player_set(table_->players_[player_index])});
-    apply_betting(player_index);
+    return apply_betting(player_index);
   }
-  void apply_blind                            () const
+  bool apply_blind                            () const
   {
     const auto small_blind_index  = table_->active_players_.find_next_circular(table_->button_player_.find_first());
     const auto small_blind_amount = ruleset_->blinds ? ruleset_->blinds->small_blind : 0;
@@ -214,9 +231,9 @@ protected:
     table_->pots_[table_->active_players_]    += big_blind_amount;
     history_->back().push_back(event {event_type::blind, player_set(table_->players_[big_blind_index]), std::nullopt, big_blind_amount});
 
-    apply_betting(table_->active_players_.find_next_circular(big_blind_index));
+    return apply_betting(table_->active_players_.find_next_circular(big_blind_index));
   }
-  void apply_bring_in                         () const
+  bool apply_bring_in                         () const
   {
     const auto evaluations     = evaluate_low(true);
     const auto player_index    = std::distance(evaluations.begin(), std::max_element(evaluations.begin(), evaluations.end()));
@@ -225,7 +242,7 @@ protected:
     table_->pots_[table_->active_players_] += bring_in_amount;
     history_->back().push_back(event {event_type::bring_in, player_set(table_->players_[player_index]), std::nullopt, bring_in_amount});
 
-    apply_betting(table_->active_players_.find_next_circular(player_index));
+    return apply_betting(table_->active_players_.find_next_circular(player_index));
   }
   void apply_burn_card                        () const
   {
@@ -293,7 +310,18 @@ protected:
   }
   void apply_showdown                         () const
   {
-    // TODO: Compute best/worst hands according to the ruleset and distribute pots.
+    if (ruleset_->ranking_type == ranking_type::ace_to_five_high_low ||
+        ruleset_->ranking_type == ranking_type::ace_to_six_high_low  ||
+        ruleset_->ranking_type == ranking_type::deuce_to_seven_high_low)
+    {
+      const auto evaluations = evaluate_high_low();
+      // TODO: Find the winner(s) of each pot, and distribute the chips.
+    }
+    else
+    {
+      const auto evaluations = evaluate();
+      // TODO: Find the winner(s) of each pot, and distribute the chips.
+    }
   }
   void finalize                               () const
   {
