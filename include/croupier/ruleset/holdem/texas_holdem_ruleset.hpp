@@ -10,10 +10,9 @@ inline ruleset make_texas_holdem_ruleset()
 return ruleset
 {
   {
+    stage::deal_closed_card               ,
+    stage::deal_closed_card               ,
     stage::blind                          ,
-    stage::deal_closed_card               ,
-    stage::deal_closed_card               ,
-    stage::betting_from_left_of_big_blind ,
     stage::burn_card                      ,
     stage::deal_community_card            ,
     stage::deal_community_card            ,

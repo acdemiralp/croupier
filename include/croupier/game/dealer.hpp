@@ -61,21 +61,19 @@ protected:
   {
     for (auto& stage : ruleset_->stages)
     {
-      if (stage == stage::ante                             ) apply_ante                             ();
-      if (stage == stage::betting_from_left_of_the_button  ) apply_betting_from_left_of_the_button  ();
-      if (stage == stage::betting_from_left_of_big_blind   ) apply_betting_from_left_of_big_blind   ();
-      if (stage == stage::betting_from_left_of_lowest_open ) apply_betting_from_left_of_lowest_open ();
-      if (stage == stage::betting_from_left_of_highest_open) apply_betting_from_left_of_highest_open();
-      if (stage == stage::blind                            ) apply_blind                            ();
-      if (stage == stage::bring_in_from_lowest_open        ) apply_bring_in_from_lowest_open        ();
-      if (stage == stage::bring_in_from_highest_open       ) apply_bring_in_from_highest_open       ();
-      if (stage == stage::burn_card                        ) apply_burn_card                        ();
-      if (stage == stage::deal_closed_card                 ) apply_deal_closed_card                 ();
-      if (stage == stage::deal_community_card              ) apply_deal_community_card              ();
-      if (stage == stage::deal_open_card                   ) apply_deal_open_card                   ();
-      if (stage == stage::deal_replacement_cards           ) apply_deal_replacement_cards           ();
-      if (stage == stage::increase_limit                   ) apply_increase_limit                   ();
-      if (stage == stage::showdown                         ) apply_showdown                         ();
+      if (stage == stage::ante                           ) apply_ante                             ();
+      if (stage == stage::betting_from_left_of_the_button) apply_betting_from_left_of_the_button  ();
+      if (stage == stage::betting_from_best_open         ) apply_betting_from_best_open           ();
+      if (stage == stage::betting_from_worst_open        ) apply_betting_from_worst_open          ();
+      if (stage == stage::blind                          ) apply_blind                            ();
+      if (stage == stage::bring_in                       ) apply_bring_in                         ();
+      if (stage == stage::burn_card                      ) apply_burn_card                        ();
+      if (stage == stage::deal_closed_card               ) apply_deal_closed_card                 ();
+      if (stage == stage::deal_community_card            ) apply_deal_community_card              ();
+      if (stage == stage::deal_open_card                 ) apply_deal_open_card                   ();
+      if (stage == stage::deal_replacement_cards         ) apply_deal_replacement_cards           ();
+      if (stage == stage::increase_limit                 ) apply_increase_limit                   ();
+      if (stage == stage::showdown                       ) apply_showdown                         ();
     }
   }
   void apply_ante                             () const
@@ -197,20 +195,11 @@ protected:
     history_->back().push_back(event {event_type::betting_from_left_of_the_button, player_set(player)});
     apply_betting(small_blind_index);
   }
-  void apply_betting_from_left_of_big_blind   () const
-  {
-    const auto  small_blind_index       = table_->active_players_.find_next_circular(table_->button_player_.find_first());
-    const auto  big_blind_index         = table_->active_players_.find_next_circular(small_blind_index);
-    const auto  left_of_big_blind_index = table_->active_players_.find_next_circular(big_blind_index  );
-    const auto& player                  = table_->players_[left_of_big_blind_index];
-    history_->back().push_back(event {event_type::betting_from_left_of_big_blind, player_set(player)});
-    apply_betting(left_of_big_blind_index);
-  }
-  void apply_betting_from_left_of_lowest_open () const
+  void apply_betting_from_best_open           () const
   {
     // TODO
   }
-  void apply_betting_from_left_of_highest_open() const
+  void apply_betting_from_worst_open          () const
   {
     // TODO
   }
@@ -227,14 +216,12 @@ protected:
     table_->players_[big_blind_index  ].chips -= big_blind_amount;
     table_->pots_[table_->active_players_]    += big_blind_amount;
     history_->back().push_back(event {event_type::blind, player_set(table_->players_[big_blind_index]), std::nullopt, big_blind_amount});
+
+    apply_betting(table_->active_players_.find_next_circular(big_blind_index));
   }
-  void apply_bring_in_from_lowest_open        () const
+  void apply_bring_in                         () const
   {
-    // TODO
-  }
-  void apply_bring_in_from_highest_open       () const
-  {
-    // TODO
+    // TODO: Compute worst open hand.
   }
   void apply_burn_card                        () const
   {

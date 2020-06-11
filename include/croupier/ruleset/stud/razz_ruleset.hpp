@@ -10,20 +10,20 @@ inline ruleset make_razz_ruleset()
 return ruleset
 {
   {
-    stage::ante                             ,
-    stage::deal_closed_card                 ,
-    stage::deal_closed_card                 ,
-    stage::deal_open_card                   ,
-    stage::bring_in_from_highest_open       ,
-    stage::deal_open_card                   , // Fourth  street.
-    stage::betting_from_left_of_lowest_open ,
-    stage::deal_open_card                   , // Fifth   street.
-    stage::increase_limit                   ,
-    stage::betting_from_left_of_lowest_open ,
-    stage::deal_open_card                   , // Sixth   street.
-    stage::betting_from_left_of_lowest_open ,
-    stage::deal_closed_card                 , // Seventh street.
-    stage::betting_from_left_of_lowest_open ,
+    stage::ante                  ,
+    stage::deal_closed_card      ,
+    stage::deal_closed_card      ,
+    stage::deal_open_card        ,
+    stage::bring_in              ,
+    stage::deal_open_card        , // Fourth  street.
+    stage::betting_from_best_open,
+    stage::deal_open_card        , // Fifth   street.
+    stage::increase_limit        ,
+    stage::betting_from_best_open,
+    stage::deal_open_card        , // Sixth   street.
+    stage::betting_from_best_open,
+    stage::deal_closed_card      , // Seventh street.
+    stage::betting_from_best_open,
     stage::showdown
   },
   1                      ,
