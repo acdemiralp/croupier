@@ -189,14 +189,16 @@ protected:
   }
   void apply_betting_from_left_of_the_button  () const
   {
-    const auto  small_blind_index = table_->active_players_.find_next_circular(table_->button_player_.find_first());
-    const auto& player            = table_->players_[small_blind_index];
-    history_->back().push_back(event {event_type::betting_from_left_of_the_button, player_set(player)});
+    const auto small_blind_index = table_->active_players_.find_next_circular(table_->button_player_.find_first());
+    history_->back().push_back(event {event_type::betting_from_left_of_the_button, player_set(table_->players_[small_blind_index])});
     apply_betting(small_blind_index);
   }
   void apply_betting_from_best_open           () const
   {
-    // TODO: Compute best open hand.
+    const auto evaluations  = evaluate(true);
+    const auto player_index = std::distance(evaluations.begin(), std::min_element(evaluations.begin(), evaluations.end()));
+    history_->back().push_back(event {event_type::betting_from_best_open, player_set(table_->players_[player_index])});
+    apply_betting(player_index);
   }
   void apply_blind                            () const
   {
@@ -216,7 +218,14 @@ protected:
   }
   void apply_bring_in                         () const
   {
-    // TODO: Compute worst open hand.
+    const auto evaluations     = evaluate_low(true);
+    const auto player_index    = std::distance(evaluations.begin(), std::max_element(evaluations.begin(), evaluations.end()));
+    const auto bring_in_amount = ruleset_->bring_in ? *ruleset_->bring_in : 0;
+    table_->players_[player_index].chips   -= bring_in_amount;
+    table_->pots_[table_->active_players_] += bring_in_amount;
+    history_->back().push_back(event {event_type::bring_in, player_set(table_->players_[player_index]), std::nullopt, bring_in_amount});
+
+    apply_betting(table_->active_players_.find_next_circular(player_index));
   }
   void apply_burn_card                        () const
   {
