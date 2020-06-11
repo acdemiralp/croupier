@@ -64,7 +64,6 @@ protected:
       if (stage == stage::ante                           ) apply_ante                             ();
       if (stage == stage::betting_from_left_of_the_button) apply_betting_from_left_of_the_button  ();
       if (stage == stage::betting_from_best_open         ) apply_betting_from_best_open           ();
-      if (stage == stage::betting_from_worst_open        ) apply_betting_from_worst_open          ();
       if (stage == stage::blind                          ) apply_blind                            ();
       if (stage == stage::bring_in                       ) apply_bring_in                         ();
       if (stage == stage::burn_card                      ) apply_burn_card                        ();
@@ -197,11 +196,7 @@ protected:
   }
   void apply_betting_from_best_open           () const
   {
-    // TODO
-  }
-  void apply_betting_from_worst_open          () const
-  {
-    // TODO
+    // TODO: Compute best open hand.
   }
   void apply_blind                            () const
   {
@@ -289,7 +284,7 @@ protected:
   }
   void apply_showdown                         () const
   {
-    // TODO
+    // TODO: Compute best/worst hands according to the ruleset and distribute pots.
   }
   void finalize                               () const
   {

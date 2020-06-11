@@ -10,7 +10,6 @@ enum class stage : std::uint8_t
   ante                           ,
   betting_from_left_of_the_button,
   betting_from_best_open         ,  
-  betting_from_worst_open        , 
   blind                          ,
   bring_in                       ,
   burn_card                      ,
