@@ -4,20 +4,21 @@ mkdir -p build
 
 cd build
 
-if [ ! -d "vcokg" ]
+if [ ! -d "vcpkg" ]
     then git clone https://github.com/Microsoft/vcpkg.git 
 fi
 
 cd vcpkg
 
-if hash vcpkg 2>/dev/null 
+if [ ! -f "vcpkg" ]
 then 
     ./bootstrap-vcpkg.sh 
 fi
 
-VCPKG_COMMAND=vcpkg install --recurse
+
 # Add your library ports here. 
-$VCPKG_COMMAND boost-dynamic-bitset boost-integer boost-functional boost-move magic-enum
+./vcpkg install --recurse boost-dynamic-bitset boost-integer boost-functional boost-move magic-enum
+
 cd ..
 
 cmake -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake ..
