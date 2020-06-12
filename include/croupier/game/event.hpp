@@ -1,12 +1,12 @@
-#ifndef CROUPIER_EVENT_HPP
-#define CROUPIER_EVENT_HPP
+#ifndef CROUPIER_GAME_EVENT_HPP
+#define CROUPIER_GAME_EVENT_HPP
 
 #include <cstdint>
 #include <optional>
 
 #include <croupier/card/card_set.hpp>
+#include <croupier/game/event_type.hpp>
 #include <croupier/player/player_set.hpp>
-#include <croupier/event_type.hpp>
 
 namespace cro
 {

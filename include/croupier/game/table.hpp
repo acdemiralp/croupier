@@ -1,14 +1,14 @@
-#ifndef CROUPIER_TABLE_HPP
-#define CROUPIER_TABLE_HPP
+#ifndef CROUPIER_GAME_TABLE_HPP
+#define CROUPIER_GAME_TABLE_HPP
 
 #include <map>
 #include <optional>
 #include <vector>
 
 #include <croupier/card/card_set.hpp>
+#include <croupier/card/deck.hpp>
 #include <croupier/player/player_set.hpp>
 #include <croupier/player/player.hpp>
-#include <croupier/deck.hpp>
 
 namespace cro
 {

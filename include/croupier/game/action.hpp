@@ -1,10 +1,10 @@
-#ifndef CROUPIER_ACTION_HPP
-#define CROUPIER_ACTION_HPP
+#ifndef CROUPIER_GAME_ACTION_HPP
+#define CROUPIER_GAME_ACTION_HPP
 
 #include <cstdint>
 #include <optional>
 
-#include <croupier/action_type.hpp>
+#include <croupier/game/action_type.hpp>
 
 namespace cro
 {

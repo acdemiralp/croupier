@@ -4,12 +4,13 @@
 #include <cstddef>
 #include <cstdint>
 #include <optional>
+#include <vector>
 
-#include <croupier/ruleset/detail/blinds.hpp>
-#include <croupier/ruleset/detail/limit_type.hpp>
-#include <croupier/ruleset/detail/limits.hpp>
-#include <croupier/ruleset/detail/ranking_type.hpp>
-#include <croupier/ruleset/detail/stage.hpp>
+#include <croupier/ruleset/blinds.hpp>
+#include <croupier/ruleset/limit_type.hpp>
+#include <croupier/ruleset/limits.hpp>
+#include <croupier/ruleset/ranking_type.hpp>
+#include <croupier/ruleset/stage.hpp>
 
 namespace cro
 {
@@ -23,7 +24,7 @@ struct ruleset
 
   limit_type                   limit_type                = limit_type::no_limit;
   std::optional<limits>        fixed_limits              = std::nullopt;
-  std::optional<std::size_t>   raise_cap                 = std::nullopt;
+  std::optional<std::size_t>   raise_cap                 = 3;
 
   ranking_type                 ranking_type              = ranking_type::traditional;
   std::size_t                  evaluated_cards           = 5;

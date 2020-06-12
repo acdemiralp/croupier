@@ -1,7 +1,6 @@
 #ifndef CROUPIER_PLAYER_PLAYER_SET_HPP
 #define CROUPIER_PLAYER_PLAYER_SET_HPP
 
-#include <bit>
 #include <cstddef>
 #include <string>
 
@@ -31,19 +30,76 @@ public:
   player_set&            operator= (const player_set&  that) = default;
   player_set&            operator= (      player_set&& temp) = default;
 
-  bool                   operator==(const player_set&  that) const
+  player_set             operator&  (const player_set& that ) const
+  {
+    return player_set(bitset_ & that.bitset_);
+  }
+  player_set             operator|  (const player_set& that ) const
+  {
+    return player_set(bitset_ | that.bitset_);
+  }
+  player_set             operator^  (const player_set& that ) const
+  {
+    return player_set(bitset_ ^ that.bitset_);
+  }
+  player_set&            operator&= (const player_set& that )
+  {
+    bitset_ &= that.bitset_;
+    return *this;
+  }
+  player_set&            operator|= (const player_set& that )
+  {
+    bitset_ |= that.bitset_;
+    return *this;
+  }
+  player_set&            operator^= (const player_set& that )
+  {
+    bitset_ ^= that.bitset_;
+    return *this;
+  }
+  player_set             operator~  () const
+  {
+    return player_set(~bitset_);
+  }
+  bool                   operator== (const player_set& that ) const
   {
     return bitset_ == that.bitset_;
   }
-  bool                   operator!=(const player_set&  that) const
+  bool                   operator!= (const player_set& that ) const
   {
     return bitset_ != that.bitset_;
   }
-  bool                   operator[](const std::size_t  position) const
+  bool                   operator<  (const player_set& that ) const
+  {
+    return bitset_.to_ulong() < that.bitset_.to_ulong();
+  }
+  bool                   operator>  (const player_set& that ) const
+  {
+    return bitset_.to_ulong() > that.bitset_.to_ulong();
+  }
+  player_set             operator<< (const std::size_t shift) const
+  {
+    return player_set(bitset_ << shift);
+  }
+  player_set             operator>> (const std::size_t shift) const
+  {
+    return player_set(bitset_ >> shift);
+  }
+  player_set&            operator<<=(const std::size_t shift)
+  {
+    bitset_ <<= shift;
+    return *this;
+  }
+  player_set&            operator>>=(const std::size_t shift)
+  {
+    bitset_ >>= shift;
+    return *this;
+  }
+  bool                   operator[] (const std::size_t position) const
   {
     return bitset_[position];
   }
-  bitset_type::reference operator[](const std::size_t  position)
+  bitset_type::reference operator[] (const std::size_t position)
   {
     return bitset_[position];
   }
