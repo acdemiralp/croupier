@@ -6,6 +6,7 @@ set_property          (GLOBAL PROPERTY USE_FOLDERS ON)
 set                   (CMAKE_CXX_STANDARD 17)
 set                   (CMAKE_CXX_VISIBILITY_PRESET hidden)
 set                   (CMAKE_VISIBILITY_INLINES_HIDDEN 1)
+set                   (CMAKE_CXX_FLAGS "-fpermissive") # No GCC quirks.
 
 include               (set_max_warning_level)
 set_max_warning_level ()

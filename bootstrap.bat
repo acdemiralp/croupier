@@ -1,5 +1,4 @@
 
-
 if not exist "build" mkdir build
 cd build
 if not exist "vcpkg" git clone https://github.com/Microsoft/vcpkg.git
