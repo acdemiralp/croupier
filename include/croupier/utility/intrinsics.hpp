@@ -12,15 +12,15 @@ namespace cro
 #if defined(__GNUC__) // GCC, Clang, ICC
 inline std::uint8_t lsb     (const std::uint64_t  bitset)
 {
-  return std::uint8_t(     __builtin_ctzll(bitboard));
+  return std::uint8_t(     __builtin_ctzll(bitset));
 }
 inline std::uint8_t msb     (const std::uint64_t  bitset)
 {
-  return std::uint8_t(63 ^ __builtin_clzll(bitboard));
+  return std::uint8_t(63 ^ __builtin_clzll(bitset));
 }
 #elif defined(_MSC_VER) // MSVC
 inline std::uint8_t lsb     (const std::uint64_t  bitset)
-{  
+{
   unsigned long index;
   _BitScanForward64(&index, bitset);
   return std::uint8_t(index);
@@ -37,13 +37,7 @@ inline std::uint8_t msb     (const std::uint64_t  bitset)
 
 inline void         pop_lsb (      std::uint64_t& bitset)
 {
-  bitset = bitset & (bitset - 1);
-}
-inline std::uint8_t count   (      std::uint64_t  bitset)
-{
-  std::uint8_t count;
-  for   (count = 0; bitset; count++, bitset &= bitset - 1);
-  return count;
+  bitset &= (bitset - 1);
 }
 }
 

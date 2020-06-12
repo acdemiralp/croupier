@@ -128,7 +128,7 @@ public:
   {
     std::string string;
 
-    auto bitset = bitset_.to_ullong();
+    std::uint64_t bitset = bitset_.to_ullong();
     while (bitset)
     {
       string += card(lsb(bitset)).string();
@@ -175,7 +175,7 @@ public:
   {
     std::vector<card> cards;
 
-    auto bitset = bitset_.to_ullong();
+    std::uint64_t bitset = bitset_.to_ullong();
     while (bitset)
     {
       cards.emplace_back(lsb(bitset));
@@ -188,7 +188,7 @@ public:
   {
     std::vector<card_set> cardsets;
 
-    auto bitset = bitset_.to_ullong();
+    std::uint64_t bitset = bitset_.to_ullong();
     while (bitset)
     {
       cardsets.emplace_back(card(lsb(bitset)));
