@@ -20,14 +20,18 @@ struct betting_state
   }
   betting_state           (const betting_state&  that) = default;
   betting_state           (      betting_state&& temp) = default;
- ~betting_state           ()                   = default;
+ ~betting_state           ()                           = default;
   betting_state& operator=(const betting_state&  that) = default;
   betting_state& operator=(      betting_state&& temp) = default;
 
-  player_set                   complying_players;
-  std::vector  <std::uint64_t> bet_amounts      ;
-  std::optional<std::uint64_t> bet_to_match     = std::nullopt;
-  std::size_t                  raises           = 0;
+  std::uint64_t bet_to_match() const
+  {
+    return *std::max_element(bet_amounts.begin(), bet_amounts.end());
+  }
+
+  player_set                 complying_players;
+  std::vector<std::uint64_t> bet_amounts      ;
+  std::size_t                raises           = 0;
 };
 }
 

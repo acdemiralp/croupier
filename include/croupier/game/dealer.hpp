@@ -91,9 +91,9 @@ protected:
     });
     history_->back().push_back(event {event_type::ante, table_->active_players_, std::nullopt, amount});
   }
-  bool apply_betting                          (const std::size_t start) const
+  bool apply_betting                          (const std::size_t start, std::optional<betting_state> pre_betting_state = std::nullopt) const
   {
-    auto state = betting_state(table_->active_players_);
+    auto state = pre_betting_state ? *pre_betting_state : betting_state(table_->active_players_);
     auto index = start;
     while (table_->active_players_ != state.complying_players)
     {
@@ -102,7 +102,7 @@ protected:
 
       if      (action.type == action_type::check)
       {
-        if (state.bet_to_match)
+        if (state.bet_to_match())
           throw std::logic_error("Can't check when there is a bet to match. Call, raise or fold instead.");
 
         state.complying_players[index] = true;
@@ -111,15 +111,15 @@ protected:
       }
       else if (action.type == action_type::bet  )
       {
-        if (state.bet_to_match)
+        if (state.bet_to_match())
           throw std::logic_error("Can't bet when there is a bet to match. Raise instead.");
         if (*action.value > player.chips)
           throw std::logic_error("Can't bet more than what you have.");
 
         // Enforce fixed/pot limits? We currently only inform the user. A bot would be specific to a limit anyway.
 
-        player.chips                   -= *action.value;
-        state.bet_amounts      [index] += *action.value;
+        player.chips             -= *action.value;
+        state.bet_amounts[index] += *action.value;
         state.complying_players.reset();
         state.complying_players[index]  = true;
 
@@ -127,12 +127,12 @@ protected:
       }
       else if (action.type == action_type::call )
       {
-        if (!state.bet_to_match)
+        if (!state.bet_to_match())
           throw std::logic_error("Can't call when there is no bet to match. Check instead.");
 
         // Call all-in if the chips are below the bet to match.
         // This also handles cases where a user is out of chips but others continue to sub-pots, in which to user simply calls.
-        const auto amount = std::min(player.chips, state.bet_to_match.value() - state.bet_amounts[index]);
+        const auto amount = std::min(player.chips, state.bet_to_match() - state.bet_amounts[index]);
 
         player.chips                   -= amount;
         state.bet_amounts      [index] += amount;
@@ -142,11 +142,11 @@ protected:
       }
       else if (action.type == action_type::raise)
       {
-        if (!state.bet_to_match)
+        if (!state.bet_to_match())
           throw std::logic_error("Can't raise when there is no bet to match. Bet instead.");
         if (*action.value > player.chips)
           throw std::logic_error("Can't raise more than what you have.");
-        if (*action.value + state.bet_amounts[index] <= state.bet_to_match)
+        if (*action.value + state.bet_amounts[index] <= state.bet_to_match())
           throw std::logic_error("Can't raise less than or equal to the bet to match.");
         if (ruleset_->raise_cap.has_value() && ++state.raises > ruleset_->raise_cap.value())
           throw std::logic_error("Can't raise further. Raise cap has been reached.");
@@ -170,6 +170,7 @@ protected:
       index = table_->active_players_.find_next_circular(index);
     }
 
+    // Distribute the bet amounts to the associated pots.
     while (!std::all_of(state.bet_amounts.begin(), state.bet_amounts.end(), [ ] (const std::uint64_t value) { return value == 0; }))
     {
       auto minimum_non_zero_bet = std::numeric_limits<std::uint64_t>::max();
@@ -222,30 +223,34 @@ protected:
   }
   bool apply_blind                            () const
   {
+    auto pre_betting_state = betting_state(table_->active_players_);
+
     const auto small_blind_index  = table_->active_players_.find_next_circular(table_->button_player_.find_first());
     const auto small_blind_amount = ruleset_->blinds ? ruleset_->blinds->small_blind : 0;
-    table_->players_[small_blind_index].chips -= small_blind_amount;
-    table_->pots_[table_->active_players_]    += small_blind_amount;
+    table_->players_[small_blind_index].chips        -= small_blind_amount;
+    pre_betting_state.bet_amounts[small_blind_index] += small_blind_amount;
     history_->back().push_back(event {event_type::blind, player_set(table_->players_[small_blind_index]), std::nullopt, small_blind_amount});
 
     const auto big_blind_index    = table_->active_players_.find_next_circular(small_blind_index);
     const auto big_blind_amount   = ruleset_->blinds ? ruleset_->blinds->big_blind   : 0;
-    table_->players_[big_blind_index  ].chips -= big_blind_amount;
-    table_->pots_[table_->active_players_]    += big_blind_amount;
+    table_->players_[big_blind_index].chips        -= big_blind_amount;
+    pre_betting_state.bet_amounts[big_blind_index] += big_blind_amount; // Although the big blind force raises, it doesn't comply (gets a second decision).
     history_->back().push_back(event {event_type::blind, player_set(table_->players_[big_blind_index]), std::nullopt, big_blind_amount});
 
-    return apply_betting(table_->active_players_.find_next_circular(big_blind_index));
+    return apply_betting(table_->active_players_.find_next_circular(big_blind_index), pre_betting_state);
   }
   bool apply_bring_in                         () const
   {
+    auto pre_betting_state = betting_state(table_->active_players_);
+
     const auto evaluations     = evaluate_low(true);
     const auto player_index    = std::distance(evaluations.begin(), std::max_element(evaluations.begin(), evaluations.end()));
     const auto bring_in_amount = ruleset_->bring_in ? *ruleset_->bring_in : 0;
-    table_->players_[player_index].chips   -= bring_in_amount;
-    table_->pots_[table_->active_players_] += bring_in_amount;
+    table_->players_[player_index].chips        -= bring_in_amount;
+    pre_betting_state.bet_amounts[player_index] += bring_in_amount; // Although the bringer force raises, it doesn't comply (gets a second decision).
     history_->back().push_back(event {event_type::bring_in, player_set(table_->players_[player_index]), std::nullopt, bring_in_amount});
 
-    return apply_betting(table_->active_players_.find_next_circular(player_index));
+    return apply_betting(table_->active_players_.find_next_circular(player_index), pre_betting_state);
   }
   void apply_burn_card                        () const
   {

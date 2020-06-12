@@ -11,10 +11,10 @@ namespace cro
 // A game consists of a dealer applying a ruleset to a table, recording each event.
 struct game
 {
-  ruleset                         ruleset;
-  table                           table  ;
-  dealer                          dealer {&ruleset, &table, &history};
-  std::vector<std::vector<event>> history;
+  ruleset                         ruleset ;
+  table                           table   ;
+  dealer                          dealer  {&ruleset, &table, &history};
+  std::vector<std::vector<event>> history {};
 };
 }
 

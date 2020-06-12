@@ -8,8 +8,12 @@ int main(int argc, char** argv)
     1000,
     [ ] (cro::player* player, cro::table* table, const cro::betting_state& state)
     {
+      if (state.bet_to_match())
+        return cro::action { cro::action_type::call  };
+      else
+        return cro::action { cro::action_type::check };
+
       // TODO: Implement smarter decision function here.
-      return cro::action { cro::action_type::check };
     },
     [ ] (cro::player* player, cro::table* table, std::optional<std::size_t> maximum_cards)
     {
@@ -18,7 +22,7 @@ int main(int argc, char** argv)
     }
   };
 
-  const auto game = cro::game { cro::make_texas_holdem_ruleset(), cro::table(std::vector<cro::player>(6, player_template)) };
+  const cro::game game { cro::make_texas_holdem_ruleset(), cro::table(std::vector<cro::player>(6, player_template)) };
   for (auto i = 0; i < 100; ++i)
     game.dealer.play();
 
