@@ -8,12 +8,11 @@ int main(int argc, char** argv)
     1000,
     [ ] (cro::player* player, cro::table* table, const cro::betting_state& state)
     {
+      // TODO: Implement smarter decision function here.
       if (state.bet_to_match())
         return cro::action { cro::action_type::call  };
       else
         return cro::action { cro::action_type::check };
-
-      // TODO: Implement smarter decision function here.
     },
     [ ] (cro::player* player, cro::table* table, std::optional<std::size_t> maximum_cards)
     {
