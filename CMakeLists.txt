@@ -30,7 +30,7 @@ assign_source_group(${PROJECT_FILES})
 include(import_library)
 
 find_package(Boost REQUIRED)
-list        (APPEND PROJECT_INCLUDE_DIRS Boost_INCLUDE_DIRS)
+list        (APPEND PROJECT_INCLUDE_DIRS ${Boost_INCLUDE_DIR})
 
 find_package(magic_enum REQUIRED)
 list        (APPEND PROJECT_LIBRARIES magic_enum::magic_enum)
