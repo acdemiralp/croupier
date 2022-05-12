@@ -30,6 +30,7 @@ public:
   evaluator& operator=(const evaluator&  that) = default;
   evaluator& operator=(      evaluator&& temp) = default;
 
+  [[nodiscard]]
   std::vector<hand_evaluation>                evaluate               (const bool open_only = false) const
   {
     auto evaluations = std::vector<hand_evaluation>(table_->players_.size());
@@ -40,15 +41,17 @@ public:
     });
     return evaluations;
   }
+  [[nodiscard]]
   hand_evaluation                             evaluate               (const card_set& cards) const
   {
-    auto combinations = make_combinations(cards, table_->community_cards_);
-    auto evaluation   = hand_evaluation {hand_type(), std::numeric_limits<std::uint16_t>::max()};
+    const auto combinations = make_combinations(cards, table_->community_cards_);
+    auto       evaluation   = hand_evaluation {hand_type(), std::numeric_limits<std::uint16_t>::max()};
     for (auto& combination : combinations)
       evaluation = std::min(evaluation, equivalences_.at(ruleset_->ranking_type).at(combination.count()).at(compute_equivalence_key(combination)));
     return evaluation;
   }
 
+  [[nodiscard]]
   std::vector<hand_evaluation>                evaluate_low           (const bool open_only = false) const
   {
     auto evaluations = std::vector<hand_evaluation>(table_->players_.size());
@@ -59,15 +62,17 @@ public:
     });
     return evaluations;
   }
+  [[nodiscard]]
   hand_evaluation                             evaluate_low           (const card_set& cards) const
   {
-    auto combinations = make_combinations(cards, table_->community_cards_);
-    auto evaluation   = hand_evaluation {hand_type(), 0};
+    const auto combinations = make_combinations(cards, table_->community_cards_);
+    auto       evaluation   = hand_evaluation {hand_type(), 0};
     for (auto& combination : combinations)
       evaluation = std::max(evaluation, equivalences_.at(ruleset_->ranking_type).at(combination.count()).at(compute_equivalence_key(combination)));
     return evaluation;
   }
 
+  [[nodiscard]]
   std::vector<std::array<hand_evaluation, 2>> evaluate_high_low      (const bool open_only = false) const
   {
     auto evaluations = std::vector<std::array<hand_evaluation, 2>>(table_->players_.size());
@@ -78,11 +83,12 @@ public:
     });
     return evaluations;
   }
+  [[nodiscard]]
   std::array<hand_evaluation, 2>              evaluate_high_low      (const card_set& cards) const
   {
-    auto combinations    = make_combinations(cards, table_->community_cards_);
-    auto high_evaluation = hand_evaluation {hand_type(), std::numeric_limits<std::uint16_t>::max()};
-    auto low_evaluation  = hand_evaluation {hand_type(), 0};
+    const auto combinations    = make_combinations(cards, table_->community_cards_);
+    auto       high_evaluation = hand_evaluation {hand_type(), std::numeric_limits<std::uint16_t>::max()};
+    auto       low_evaluation  = hand_evaluation {hand_type(), 0};
     for (auto& combination : combinations)
     {
       auto evaluation = equivalences_.at(ruleset_->ranking_type).at(combination.count()).at(compute_equivalence_key(combination));
@@ -93,17 +99,19 @@ public:
   }
 
 protected:
-  std::vector<card_set>                       make_combinations      (const card_set& cards, std::optional<card_set> community_cards) const
+  [[nodiscard]]
+  std::vector<card_set>                       make_combinations      (const card_set& cards, const std::optional<card_set> community_cards) const
   {
     if (ruleset_->evaluated_community_cards)
       return community_cards->combinations(*ruleset_->evaluated_community_cards) | cards.combinations(ruleset_->evaluated_cards - *ruleset_->evaluated_community_cards);
     return (community_cards ? cards | *community_cards : cards).combinations(ruleset_->evaluated_cards);
   }
-  std::int32_t                                compute_equivalence_key(const card_set& cards) const
+  [[nodiscard]]
+  static std::int32_t                         compute_equivalence_key(const card_set& cards)
   {
-    auto key = std::int32_t(1);
+    auto key = 1;
 
-    auto split = cards.cards();
+    const auto split = cards.cards();
     for (auto& card : split)
       key *= rank_to_prime(card.rank());    // Multiply the prime of each card rank in card_set.
 

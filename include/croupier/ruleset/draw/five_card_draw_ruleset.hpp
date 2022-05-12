@@ -24,7 +24,7 @@ return ruleset
   },
   std::nullopt,
   std::nullopt,
-  blinds {1, 2}            
+  blinds {1, 2}
 };
 }
 }

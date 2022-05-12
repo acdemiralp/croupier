@@ -30,7 +30,7 @@ inline std::string hand_type_to_string  (const hand_type    hand_type)
   if (hand_type == hand_type::full_house      ) return "FH";
   if (hand_type == hand_type::four_of_a_kind  ) return "4K";
   if (hand_type == hand_type::straight_flush  ) return "SF";
-  return std::string();
+  return {};
 }
 inline hand_type   hand_type_from_string(const std::string& string   )
 {
@@ -43,7 +43,7 @@ inline hand_type   hand_type_from_string(const std::string& string   )
   if (string == "FH") return hand_type::full_house     ;
   if (string == "4K") return hand_type::four_of_a_kind ;
   if (string == "SF") return hand_type::straight_flush ;
-  return hand_type(0);
+  return static_cast<hand_type>(0);
 }
 }
 

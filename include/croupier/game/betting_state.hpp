@@ -3,7 +3,6 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <optional>
 #include <vector>
 
 #include <croupier/player/player_set.hpp>
@@ -18,12 +17,13 @@ struct betting_state
   {
 
   }
-  betting_state           (const betting_state&  that) = default;
-  betting_state           (      betting_state&& temp) = default;
- ~betting_state           ()                           = default;
-  betting_state& operator=(const betting_state&  that) = default;
-  betting_state& operator=(      betting_state&& temp) = default;
+  betting_state           (const betting_state&  that)          = default;
+  betting_state           (      betting_state&& temp) noexcept = default;
+ ~betting_state           ()                                    = default;
+  betting_state& operator=(const betting_state&  that)          = default;
+  betting_state& operator=(      betting_state&& temp) noexcept = default;
 
+  [[nodiscard]]
   std::uint64_t bet_to_match() const
   {
     return *std::max_element(bet_amounts.begin(), bet_amounts.end());

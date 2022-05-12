@@ -107,10 +107,12 @@ public:
     return *this;
   }
 
+  [[nodiscard]]
   std::size_t           count          () const
   {
     return bitset_.count();
   }
+  [[nodiscard]]
   std::size_t           size           () const
   {
     return bitset_.size ();
@@ -123,7 +125,8 @@ public:
   {
     bitset_.reset();
   }
-                                       
+
+  [[nodiscard]]
   std::string           string         () const
   {
     std::string string;
@@ -154,23 +157,28 @@ public:
   {
     bitset_ ^= (bitset_type(1) << card.index());
   }
+  [[nodiscard]]
   bool                  contains       (const card_set& that) const
   {
     return (*this & that) == that;
   }
+  [[nodiscard]]
   bool                  contains       (const card&     card) const
   {
     return (bitset_ & (bitset_type(1) << card.index())) != 0;
   }
+  [[nodiscard]]
   bool                  intersects     (const card_set& that) const
   {
     return (*this & that) != card_set(bitset_type(0));
   }
+  [[nodiscard]]
   bool                  disjoint       (const card_set& that) const
   {
     return (*this & that) == card_set(bitset_type(0));
   }
-                                       
+
+  [[nodiscard]]
   std::vector<card>     cards          () const
   {
     std::vector<card> cards;
@@ -184,28 +192,30 @@ public:
 
     return cards;
   }
+  [[nodiscard]]
   std::vector<card_set> split          () const
   {
-    std::vector<card_set> cardsets;
+    std::vector<card_set> card_sets;
 
     std::uint64_t bitset = bitset_.to_ullong();
     while (bitset)
     {
-      cardsets.emplace_back(card(lsb(bitset)));
+      card_sets.emplace_back(card(lsb(bitset)));
       pop_lsb(bitset);
     }
 
-    return cardsets;
+    return card_sets;
   }
-                                       
+
+  [[nodiscard]]
   std::vector<card_set> combinations   (const std::size_t k) const
   {
     if (k > bitset_.count()) return { *this };
 
-    auto combinations = std::vector<card_set>();
-    auto selector     = std::vector<bool>(bitset_.count());
-    auto split_cards  = cards();
-    std::fill(selector.begin(), selector.begin() + k, true);
+    auto       combinations = std::vector<card_set>();
+    auto       selector     = std::vector<bool>(bitset_.count());
+    const auto split_cards  = cards();
+    std::fill_n(selector.begin(), k, true);
     do
     {
       auto& combination = combinations.emplace_back();
@@ -216,6 +226,7 @@ public:
     return combinations;
   }
 
+  [[nodiscard]]
   bitset_type           bitset         () const
   {
     return bitset_;

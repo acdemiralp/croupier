@@ -15,7 +15,7 @@ class player_set
 public:
   using bitset_type = boost::dynamic_bitset<>;
 
-  explicit player_set              (const bitset_type bitset = bitset_type()) : bitset_(bitset)
+  explicit player_set              (const bitset_type& bitset = bitset_type()) : bitset_(bitset)
   {
     
   }
@@ -104,10 +104,12 @@ public:
     return bitset_[position];
   }
 
+  [[nodiscard]]
   std::size_t count             () const
   {
     return bitset_.count();
   }
+  [[nodiscard]]
   std::size_t size              () const
   {
     return bitset_.size ();
@@ -125,6 +127,7 @@ public:
     bitset_.reset();
   }
 
+  [[nodiscard]]
   std::string string            () const
   {
     std::string string;
@@ -141,10 +144,12 @@ public:
     bitset_ = bitset_ >> count | bitset_ << (bitset_.size() - count);
   }
 
+  [[nodiscard]]
   std::size_t find_first        () const
   {
     return bitset_.find_first();
   }
+  [[nodiscard]]
   std::size_t find_next         (const std::size_t index) const
   {
     return bitset_.find_next(index);
@@ -163,6 +168,7 @@ public:
     }
   }
 
+  [[nodiscard]]
   std::size_t find_next_circular(const std::size_t index) const
   {
     const auto next_index = find_next(index);
@@ -181,6 +187,7 @@ public:
     }
   }
 
+  [[nodiscard]]
   bitset_type bitset            () const
   {
     return bitset_;

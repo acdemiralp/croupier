@@ -32,8 +32,8 @@ inline std::vector<card_set>        make_suit_masks    ()
 }
 inline std::vector<std::bitset<13>> make_straight_masks()
 {
-  std::vector<std::bitset<13>> straight_masks(10, std::bitset<13>("1111000000001")); // A2345 is a special case.
-  std::bitset<13>              straight_mask ("1111100000000"); // Start at 23456 (end at TJQKA).
+  std::vector     straight_masks(10, std::bitset<13>("1111000000001")); // A2345 is a special case.
+  std::bitset<13> straight_mask ("1111100000000"); // Start at 23456 (end at TJQKA).
   for (std::size_t i = 1; i < straight_masks.size(); ++i)
   {
     straight_masks[i] = straight_mask;

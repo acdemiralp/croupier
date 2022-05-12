@@ -9,25 +9,25 @@ template <>
 inline std::unordered_map<std::int32_t, hand_evaluation> make_equivalence_classes<ranking_type::badugi, 1>()
 {
   // TODO
-  return std::unordered_map<std::int32_t, hand_evaluation>();
+  return {};
 }
 template <>
 inline std::unordered_map<std::int32_t, hand_evaluation> make_equivalence_classes<ranking_type::badugi, 2>()
 {
   // TODO
-  return std::unordered_map<std::int32_t, hand_evaluation>();
+  return {};
 }
 template <>
 inline std::unordered_map<std::int32_t, hand_evaluation> make_equivalence_classes<ranking_type::badugi, 3>()
 {
   // TODO
-  return std::unordered_map<std::int32_t, hand_evaluation>();
+  return {};
 }
 template <>
 inline std::unordered_map<std::int32_t, hand_evaluation> make_equivalence_classes<ranking_type::badugi, 4>()
 {
   // TODO
-  return std::unordered_map<std::int32_t, hand_evaluation>();
+  return {};
 }
 }
 #endif

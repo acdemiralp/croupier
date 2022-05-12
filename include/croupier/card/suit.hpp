@@ -26,7 +26,7 @@ inline char        suit_to_char  (const suit suit     )
   if (suit == suit::diamonds) return 'd';
   if (suit == suit::hearts  ) return 'h';
   if (suit == suit::spades  ) return 's';
-  return char(0);
+  return static_cast<char>(0);
 }
 inline suit        suit_from_char(const char character)
 {
@@ -34,7 +34,7 @@ inline suit        suit_from_char(const char character)
   if (character == 'd' || character == 'D') return suit::diamonds;
   if (character == 'h' || character == 'H') return suit::hearts  ;
   if (character == 's' || character == 'S') return suit::spades  ;
-  return suit(0);
+  return static_cast<suit>(0);
 }
 }
 

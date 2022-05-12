@@ -44,7 +44,7 @@ inline char         rank_to_char   (const rank rank     )
   if (rank == rank::Q ) return 'Q';
   if (rank == rank::K ) return 'K';
   if (rank == rank::A ) return 'A';
-  return char(0);
+  return static_cast<char>(0);
 }
 inline rank         rank_from_char (const char character)
 {
@@ -61,7 +61,7 @@ inline rank         rank_from_char (const char character)
   if (character == 'Q' || character == 'q') return rank::Q ;
   if (character == 'K' || character == 'k') return rank::K ;
   if (character == 'A' || character == 'a') return rank::A ;
-  return rank(0);
+  return static_cast<rank>(0);
 }
 
 inline std::uint8_t rank_to_prime  (const rank rank     )
@@ -96,7 +96,7 @@ inline rank         rank_from_prime(const std::uint8_t prime)
   if (prime == 31) return rank::Q ;
   if (prime == 37) return rank::K ;
   if (prime == 41) return rank::A ;
-  return rank(0);
+  return static_cast<rank>(0);
 }
 }
 

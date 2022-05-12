@@ -43,23 +43,28 @@ public:
     cards_         .pop_front();
     return history_.back     ();
   }
+  [[nodiscard]]
   const card&              peek   () const
   {
     return cards_.front();
   }
+  [[nodiscard]]
   std::size_t              size   () const
   {
     return cards_.size ();
   }
+  [[nodiscard]]
   bool                     empty  () const
   {
     return cards_.empty();
   }
 
+  [[nodiscard]]
   const std::deque <card>& cards  () const
   {
     return cards_;
   }
+  [[nodiscard]]
   const std::vector<card>& history() const
   {
     return history_;
@@ -73,10 +78,10 @@ protected:
     std::uniform_int_distribution<std::uint16_t> distribution              ;
     for (auto i = cards.size() - 1; i > 0; --i)
     {
-      distribution.param(std::uniform_int_distribution<std::uint16_t>::param_type(0, i));
+      distribution.param(std::uniform_int_distribution<std::uint16_t>::param_type(0, static_cast<std::uint16_t>(i)));
       std::swap(cards[i], cards[distribution(mersenne_twister)]);
     }
-  };
+  }
 
   std::deque <card> cards_  ;
   std::vector<card> history_;

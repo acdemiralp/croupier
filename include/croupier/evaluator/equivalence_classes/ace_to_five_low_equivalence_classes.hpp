@@ -16,8 +16,8 @@ namespace cro
 template <>
 inline std::unordered_map<std::int32_t, hand_evaluation> make_equivalence_classes<ranking_type::ace_to_five_low, 1>()
 {
-  auto map   = std::unordered_map<std::int32_t, hand_evaluation>();
-  auto ranks = std::vector<rank>
+  auto       map   = std::unordered_map<std::int32_t, hand_evaluation>();
+  const auto ranks = std::vector
   {
     rank::A ,
     rank::_2,
@@ -37,9 +37,8 @@ inline std::unordered_map<std::int32_t, hand_evaluation> make_equivalence_classe
   // Generate high-cards.
   for (auto& r1 : ranks)
   {
-    const auto key = rank_to_prime(r1);
-    if (!map.count(key))
-      map[key] = hand_evaluation{ hand_type::high_card, std::uint16_t(map.size()) };
+    if (const auto key = rank_to_prime(r1); !map.count(key))
+      map[key] = hand_evaluation{ hand_type::high_card, static_cast<std::uint16_t>(map.size()) };
   }
 
   return map;
@@ -47,8 +46,8 @@ inline std::unordered_map<std::int32_t, hand_evaluation> make_equivalence_classe
 template <>
 inline std::unordered_map<std::int32_t, hand_evaluation> make_equivalence_classes<ranking_type::ace_to_five_low, 2>()
 {
-  auto map   = std::unordered_map<std::int32_t, hand_evaluation>();
-  auto ranks = std::vector<rank>
+  auto       map   = std::unordered_map<std::int32_t, hand_evaluation>();
+  const auto ranks = std::vector
   {
     rank::A ,
     rank::_2,
@@ -72,18 +71,16 @@ inline std::unordered_map<std::int32_t, hand_evaluation> make_equivalence_classe
     {
       if (r1 == r2) continue;
 
-      const auto key = rank_to_prime(r1) * rank_to_prime(r2);
-      if (!map.count(key))
-        map[key] = hand_evaluation{ hand_type::high_card, std::uint16_t(map.size()) };
+      if (const auto key = rank_to_prime(r1) * rank_to_prime(r2); !map.count(key))
+        map[key] = hand_evaluation{ hand_type::high_card, static_cast<std::uint16_t>(map.size()) };
     }
   }
 
   // Generate pairs.
   for (auto& r1 : ranks)
   {
-    const auto key = std::pow(rank_to_prime(r1), 2);
-    if (!map.count(key))
-      map[key] = hand_evaluation{ hand_type::pair, std::uint16_t(map.size()) };
+    if (const auto key = static_cast<std::int32_t>(std::pow(rank_to_prime(r1), 2)); !map.count(key))
+      map[key] = hand_evaluation{ hand_type::pair, static_cast<std::uint16_t>(map.size()) };
   }
 
   return map;
@@ -91,8 +88,8 @@ inline std::unordered_map<std::int32_t, hand_evaluation> make_equivalence_classe
 template <>
 inline std::unordered_map<std::int32_t, hand_evaluation> make_equivalence_classes<ranking_type::ace_to_five_low, 3>()
 {
-  auto map   = std::unordered_map<std::int32_t, hand_evaluation>();
-  auto ranks = std::vector<rank>
+  auto       map   = std::unordered_map<std::int32_t, hand_evaluation>();
+  const auto ranks = std::vector
   {
     rank::A ,
     rank::_2,
@@ -119,9 +116,8 @@ inline std::unordered_map<std::int32_t, hand_evaluation> make_equivalence_classe
       {
         if (r1 == r3 || r2 == r3) continue;
 
-        const auto key = rank_to_prime(r1) * rank_to_prime(r2) * rank_to_prime(r3);
-        if (!map.count(key))
-          map[key] = hand_evaluation{ hand_type::high_card, std::uint16_t(map.size()) };
+        if (const auto key = rank_to_prime(r1) * rank_to_prime(r2) * rank_to_prime(r3); !map.count(key))
+          map[key] = hand_evaluation{ hand_type::high_card, static_cast<std::uint16_t>(map.size()) };
       }
     }
   }
@@ -133,18 +129,16 @@ inline std::unordered_map<std::int32_t, hand_evaluation> make_equivalence_classe
     {
       if (r1 == r2) continue;
 
-      const auto key = std::pow(rank_to_prime(r1), 2) * rank_to_prime(r2);
-      if (!map.count(key))
-        map[key] = hand_evaluation{ hand_type::pair, std::uint16_t(map.size()) };
+      if (const auto key = static_cast<std::int32_t>(std::pow(rank_to_prime(r1), 2)) * rank_to_prime(r2); !map.count(key))
+        map[key] = hand_evaluation{ hand_type::pair, static_cast<std::uint16_t>(map.size()) };
     }
   }
 
   // Generate three-of-a-kinds.
   for (auto& r1 : ranks)
   {
-    const auto key = std::pow(rank_to_prime(r1), 3);
-    if (!map.count(key))
-      map[key] = hand_evaluation{ hand_type::three_of_a_kind, std::uint16_t(map.size()) };
+    if (const auto key = static_cast<std::int32_t>(std::pow(rank_to_prime(r1), 3)); !map.count(key))
+      map[key] = hand_evaluation{ hand_type::three_of_a_kind, static_cast<std::uint16_t>(map.size()) };
   }
 
   return map;
@@ -152,8 +146,8 @@ inline std::unordered_map<std::int32_t, hand_evaluation> make_equivalence_classe
 template <>
 inline std::unordered_map<std::int32_t, hand_evaluation> make_equivalence_classes<ranking_type::ace_to_five_low, 4>()
 {
-  auto map   = std::unordered_map<std::int32_t, hand_evaluation>();
-  auto ranks = std::vector<rank>
+  auto       map   = std::unordered_map<std::int32_t, hand_evaluation>();
+  const auto ranks = std::vector
   {
     rank::A ,
     rank::_2,
@@ -182,10 +176,9 @@ inline std::unordered_map<std::int32_t, hand_evaluation> make_equivalence_classe
         for (auto& r4 : ranks)
         {
           if (r1 == r4 || r2 == r4 || r3 == r4) continue;
-          
-          const auto key = rank_to_prime(r1) * rank_to_prime(r2) * rank_to_prime(r3) * rank_to_prime(r4);
-          if (!map.count(key))
-            map[key] = hand_evaluation { hand_type::high_card, std::uint16_t(map.size()) };
+
+          if (const auto key = rank_to_prime(r1) * rank_to_prime(r2) * rank_to_prime(r3) * rank_to_prime(r4); !map.count(key))
+            map[key] = hand_evaluation { hand_type::high_card, static_cast<std::uint16_t>(map.size()) };
         }
       }
     }
@@ -201,9 +194,8 @@ inline std::unordered_map<std::int32_t, hand_evaluation> make_equivalence_classe
       {
         if (r1 == r3 || r2 == r3) continue;
 
-        const auto key = std::pow(rank_to_prime(r1), 2) * rank_to_prime(r2) * rank_to_prime(r3);
-        if (!map.count(key))
-          map[key] = hand_evaluation { hand_type::pair, std::uint16_t(map.size()) };
+        if (const auto key = static_cast<std::int32_t>(std::pow(rank_to_prime(r1), 2)) * rank_to_prime(r2) * rank_to_prime(r3); !map.count(key))
+          map[key] = hand_evaluation { hand_type::pair, static_cast<std::uint16_t>(map.size()) };
       }
     }
   }
@@ -215,9 +207,8 @@ inline std::unordered_map<std::int32_t, hand_evaluation> make_equivalence_classe
     {
       if (r1 == r2) continue;
 
-      const auto key = std::pow(rank_to_prime(r1), 2) * std::pow(rank_to_prime(r2), 2);
-      if (!map.count(key))
-        map[key] = hand_evaluation { hand_type::two_pairs, std::uint16_t(map.size()) };
+      if (const auto key = static_cast<std::int32_t>(std::pow(rank_to_prime(r1), 2) * std::pow(rank_to_prime(r2), 2)); !map.count(key))
+        map[key] = hand_evaluation { hand_type::two_pairs, static_cast<std::uint16_t>(map.size()) };
     }
   }
 
@@ -228,18 +219,16 @@ inline std::unordered_map<std::int32_t, hand_evaluation> make_equivalence_classe
     {
       if (r1 == r2) continue;
 
-      const auto key = std::pow(rank_to_prime(r1), 3) * rank_to_prime(r2);
-      if (!map.count(key))
-        map[key] = hand_evaluation{ hand_type::three_of_a_kind, std::uint16_t(map.size()) };
+      if (const auto key = static_cast<std::int32_t>(std::pow(rank_to_prime(r1), 3)) * rank_to_prime(r2); !map.count(key))
+        map[key] = hand_evaluation{ hand_type::three_of_a_kind, static_cast<std::uint16_t>(map.size()) };
     }
   }
 
   // Generate four-of-a-kinds.
   for (auto& r1 : ranks)
   {
-    const auto key = std::pow(rank_to_prime(r1), 4);
-    if (!map.count(key))
-      map[key] = hand_evaluation{ hand_type::four_of_a_kind, std::uint16_t(map.size()) };
+    if (const auto key = static_cast<std::int32_t>(std::pow(rank_to_prime(r1), 4)); !map.count(key))
+      map[key] = hand_evaluation{ hand_type::four_of_a_kind, static_cast<std::uint16_t>(map.size()) };
   }
 
   return map;
@@ -247,8 +236,8 @@ inline std::unordered_map<std::int32_t, hand_evaluation> make_equivalence_classe
 template <>
 inline std::unordered_map<std::int32_t, hand_evaluation> make_equivalence_classes<ranking_type::ace_to_five_low, 5>()
 {
-  auto map   = std::unordered_map<std::int32_t, hand_evaluation>();
-  auto ranks = std::vector<rank>
+  auto       map   = std::unordered_map<std::int32_t, hand_evaluation>();
+  const auto ranks = std::vector
   {
     rank::A ,
     rank::_2,
@@ -281,9 +270,8 @@ inline std::unordered_map<std::int32_t, hand_evaluation> make_equivalence_classe
           {
             if (r1 == r5 || r2 == r5 || r3 == r5 || r4 == r5) continue;
 
-            const auto key = rank_to_prime(r1) * rank_to_prime(r2) * rank_to_prime(r3) * rank_to_prime(r4) * rank_to_prime(r5);
-            if (!map.count(key))
-              map[key] = hand_evaluation { hand_type::high_card, std::uint16_t(map.size()) };
+            if (const auto key = rank_to_prime(r1) * rank_to_prime(r2) * rank_to_prime(r3) * rank_to_prime(r4) * rank_to_prime(r5); !map.count(key))
+              map[key] = hand_evaluation { hand_type::high_card, static_cast<std::uint16_t>(map.size()) };
           }
         }
       }
@@ -303,9 +291,8 @@ inline std::unordered_map<std::int32_t, hand_evaluation> make_equivalence_classe
         {
           if (r1 == r4 || r2 == r4 || r3 == r4) continue;
 
-          const auto key = std::pow(rank_to_prime(r1), 2) * rank_to_prime(r2) * rank_to_prime(r3) * rank_to_prime(r4);
-          if (!map.count(key))
-            map[key] = hand_evaluation { hand_type::pair, std::uint16_t(map.size()) };
+          if (const auto key = static_cast<std::int32_t>(std::pow(rank_to_prime(r1), 2)) * rank_to_prime(r2) * rank_to_prime(r3) * rank_to_prime(r4); !map.count(key))
+            map[key] = hand_evaluation { hand_type::pair, static_cast<std::uint16_t>(map.size()) };
         }
       }
     }
@@ -321,9 +308,8 @@ inline std::unordered_map<std::int32_t, hand_evaluation> make_equivalence_classe
       {
         if (r1 == r3 || r2 == r3) continue;
 
-        const auto key = std::pow(rank_to_prime(r1), 2) * std::pow(rank_to_prime(r2), 2) * rank_to_prime(r3);
-        if (!map.count(key))
-          map[key] = hand_evaluation { hand_type::two_pairs, std::uint16_t(map.size()) };
+        if (const auto key = static_cast<std::int32_t>(std::pow(rank_to_prime(r1), 2) * std::pow(rank_to_prime(r2), 2) * rank_to_prime(r3)); !map.count(key))
+          map[key] = hand_evaluation { hand_type::two_pairs, static_cast<std::uint16_t>(map.size()) };
       }
     }
   }
@@ -338,9 +324,8 @@ inline std::unordered_map<std::int32_t, hand_evaluation> make_equivalence_classe
       {
         if (r1 == r3 || r2 == r3) continue;
 
-        const auto key = std::pow(rank_to_prime(r1), 3) * rank_to_prime(r2) * rank_to_prime(r3);
-        if (!map.count(key))
-          map[key] = hand_evaluation { hand_type::three_of_a_kind, std::uint16_t(map.size()) };
+        if (const auto key = static_cast<std::int32_t>(std::pow(rank_to_prime(r1), 3)) * rank_to_prime(r2) * rank_to_prime(r3); !map.count(key))
+          map[key] = hand_evaluation { hand_type::three_of_a_kind, static_cast<std::uint16_t>(map.size()) };
       }
     }
   }
@@ -352,9 +337,8 @@ inline std::unordered_map<std::int32_t, hand_evaluation> make_equivalence_classe
     {
       if (r1 == r2) continue;
 
-      const auto key = std::pow(rank_to_prime(r1), 3) * std::pow(rank_to_prime(r2), 2);
-      if (!map.count(key))
-        map[key] = hand_evaluation { hand_type::full_house, std::uint16_t(map.size()) };
+      if (const auto key = static_cast<std::int32_t>(std::pow(rank_to_prime(r1), 3) * std::pow(rank_to_prime(r2), 2)); !map.count(key))
+        map[key] = hand_evaluation { hand_type::full_house, static_cast<std::uint16_t>(map.size()) };
     }
   }
 
@@ -365,9 +349,8 @@ inline std::unordered_map<std::int32_t, hand_evaluation> make_equivalence_classe
     {
       if (r1 == r2) continue;
 
-      const auto key = std::pow(rank_to_prime(r1), 4) * rank_to_prime(r2);
-      if (!map.count(key))
-        map[key] = hand_evaluation { hand_type::four_of_a_kind, std::uint16_t(map.size()) };
+      if (const auto key = static_cast<std::int32_t>(std::pow(rank_to_prime(r1), 4)) * rank_to_prime(r2); !map.count(key))
+        map[key] = hand_evaluation { hand_type::four_of_a_kind, static_cast<std::uint16_t>(map.size()) };
     }
   }
 

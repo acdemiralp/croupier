@@ -12,24 +12,24 @@ namespace cro
 #if defined(__GNUC__) // GCC, Clang, ICC
 inline std::uint8_t lsb     (const std::uint64_t  bitset)
 {
-  return std::uint8_t(     __builtin_ctzll(bitset));
+  return static_cast<std::uint8_t>(     __builtin_ctzll(bitset));
 }
 inline std::uint8_t msb     (const std::uint64_t  bitset)
 {
-  return std::uint8_t(63 ^ __builtin_clzll(bitset));
+  return static_cast<std::uint8_t>(63 ^ __builtin_clzll(bitset));
 }
 #elif defined(_MSC_VER) // MSVC
 inline std::uint8_t lsb     (const std::uint64_t  bitset)
 {
   unsigned long index;
   _BitScanForward64(&index, bitset);
-  return std::uint8_t(index);
+  return static_cast<std::uint8_t>(index);
 }
 inline std::uint8_t msb     (const std::uint64_t  bitset)
 {
   unsigned long index;
   _BitScanReverse64(&index, bitset);
-  return std::uint8_t(index);
+  return static_cast<std::uint8_t>(index);
 }
 #else  // Compiler is neither GCC nor MSVC
 #error "Compiler not supported."
