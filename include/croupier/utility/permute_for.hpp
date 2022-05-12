@@ -8,7 +8,7 @@ namespace cro
 {
 // Ducks [] and .size() on the type.
 template <typename type>
-void permute_for(
+constexpr void permute_for(
   const std::function<void(const type&)>& function, 
   const type&                             start   ,
   const type&                             end     ,

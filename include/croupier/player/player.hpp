@@ -16,11 +16,12 @@ class  table;
 
 struct player
 {
+  [[nodiscard]]
   std::size_t index() const;
 
   std::uint64_t                                                        chips                     ;
   std::function<action  (player*, table*, const betting_state&)>       decision_function         ;
-  std::function<card_set(player*, table*, std::optional<std::size_t>)> card_replacement_function ;
+  std::function<card_set(player*, table*, std::optional<std::size_t>)> card_replacement_function = {};
   table*                                                               table                     = nullptr;
   card_set                                                             open_cards                = card_set();
   card_set                                                             closed_cards              = card_set();

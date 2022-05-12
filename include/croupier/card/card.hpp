@@ -18,7 +18,7 @@ public:
   {
     
   }
-  explicit card   (const rank rank, const suit suit) : card(index_type(rank) + index_type(suit) * rank_count())
+  explicit card   (const rank rank, const suit suit) : card(static_cast<index_type>(rank) + static_cast<index_type>(suit) * static_cast<index_type>(rank_count()))
   {
     
   }
@@ -42,18 +42,22 @@ public:
     return   index_ % rank_count() <  that.index_ % rank_count();
   }
 
+  [[nodiscard]]
   index_type  index () const
   {
     return index_;
   }
+  [[nodiscard]]
   rank        rank  () const
   {
-    return cro::rank(index_ % rank_count());
+    return static_cast<cro::rank>(index_ % rank_count());
   }
+  [[nodiscard]]
   suit        suit  () const
   {
-    return cro::suit(index_ / rank_count());
+    return static_cast<cro::suit>(index_ / rank_count());
   }
+  [[nodiscard]]
   std::string string() const
   {
     return std::string(1, rank_to_char(rank())) + std::string(1, suit_to_char(suit()));

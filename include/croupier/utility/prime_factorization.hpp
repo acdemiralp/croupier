@@ -7,7 +7,7 @@
 namespace cro
 {
 template<typename type>
-std::vector<type> prime_factorize(type value)
+constexpr std::vector<type> prime_factorize(type value)
 {
   std::vector<type> prime_factors;
 

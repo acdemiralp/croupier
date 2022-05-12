@@ -16,7 +16,7 @@ namespace cro
 class dealer : public evaluator
 {
 public:
-  dealer           (ruleset* ruleset, table* table, std::vector<std::vector<event>>* history) : evaluator(ruleset, table), ruleset_(ruleset), table_(table), history_(history)
+  dealer           (ruleset* ruleset, table* table, std::vector<std::vector<event>>* history) : evaluator(ruleset, table), history_(history)
   {
 
   }
@@ -62,7 +62,7 @@ protected:
   }
   void apply_stages                           () const
   {
-    for (auto& stage : ruleset_->stages)
+    for (const auto& stage : ruleset_->stages)
     {
       auto early_terminate = false;
       if (stage == stage::ante                           )                   apply_ante                             ();
@@ -91,7 +91,8 @@ protected:
     });
     history_->back().push_back(event {event_type::ante, table_->active_players_, std::nullopt, amount});
   }
-  bool apply_betting                          (const std::size_t start, std::optional<betting_state> pre_betting_state = std::nullopt) const
+  [[nodiscard]]
+  bool apply_betting                          (const std::size_t start, const std::optional<betting_state>& pre_betting_state = std::nullopt) const
   {
     auto state = pre_betting_state ? *pre_betting_state : betting_state(table_->active_players_);
     auto index = start;
@@ -174,15 +175,13 @@ protected:
     while (!std::all_of(state.bet_amounts.begin(), state.bet_amounts.end(), [ ] (const std::uint64_t value) { return value == 0; }))
     {
       auto minimum_non_zero_bet = std::numeric_limits<std::uint64_t>::max();
-      for (auto i = 0; i < state.bet_amounts.size(); ++i)
-      {
-        if (state.bet_amounts[i] != 0 && minimum_non_zero_bet > state.bet_amounts[i])
-          minimum_non_zero_bet = state.bet_amounts[i];
-      }
+      for (const auto bet_amount : state.bet_amounts)
+        if (bet_amount != 0 && minimum_non_zero_bet > bet_amount)
+          minimum_non_zero_bet = bet_amount;
 
       auto players = player_set(table_->active_players_.size());
-      auto total   = std::uint64_t(0);
-      for (auto i = 0; i < state.bet_amounts.size(); ++i)
+      auto total   = static_cast<std::uint64_t>(0);
+      for (std::size_t i = 0; i < state.bet_amounts.size(); ++i)
       {
         if (state.bet_amounts[i] >= minimum_non_zero_bet)
         {
@@ -208,12 +207,14 @@ protected:
 
     return table_->active_players_.count() == 1; // If only one player is active, the game early terminates.
   }
+  [[nodiscard]]
   bool apply_betting_from_left_of_the_button  () const
   {
     const auto small_blind_index = table_->active_players_.find_next_circular(table_->button_player_.find_first());
     history_->back().push_back(event {event_type::betting_from_left_of_the_button, player_set(table_->players_[small_blind_index])});
     return apply_betting(small_blind_index);
   }
+  [[nodiscard]]
   bool apply_betting_from_best_open           () const
   {
     const auto evaluations  = evaluate(true);
@@ -221,6 +222,7 @@ protected:
     history_->back().push_back(event {event_type::betting_from_best_open, player_set(table_->players_[player_index])});
     return apply_betting(player_index);
   }
+  [[nodiscard]]
   bool apply_blind                            () const
   {
     auto pre_betting_state = betting_state(table_->active_players_);
@@ -239,6 +241,7 @@ protected:
 
     return apply_betting(table_->active_players_.find_next_circular(big_blind_index), pre_betting_state);
   }
+  [[nodiscard]]
   bool apply_bring_in                         () const
   {
     auto pre_betting_state = betting_state(table_->active_players_);
@@ -262,8 +265,8 @@ protected:
     const auto small_blind_index = table_->active_players_.find_next_circular(table_->button_player_.find_first());
     table_->active_players_.iterate_circular(small_blind_index, [&] (const std::size_t index)
     {
-      auto& player = table_->players_[index];
-      auto  card   = table_->deck_.draw();
+      auto&      player = table_->players_[index];
+      const auto card   = table_->deck_.draw();
       player.closed_cards.insert(card);
       history_->back().push_back(event {event_type::deal_closed_card, player_set(player), card_set(card)});
     });
@@ -279,8 +282,8 @@ protected:
     const auto small_blind_index = table_->active_players_.find_next_circular(table_->button_player_.find_first());
     table_->active_players_.iterate_circular(small_blind_index, [&] (const std::size_t index)
     {
-      auto& player = table_->players_[index];
-      auto  card   = table_->deck_.draw();
+      auto&      player = table_->players_[index];
+      const auto card   = table_->deck_.draw();
       player.open_cards.insert(card);
       history_->back().push_back(event {event_type::deal_open_card, player_set(player), card_set(card)});
     });
@@ -294,16 +297,16 @@ protected:
       auto  removed_cards = player.card_replacement_function(&player, table_, ruleset_->maximum_replacement_cards);
       // Enforce maximum_replacement_cards limit? We currently only inform the user.
 
-      auto removed_closed_cards = removed_cards & player.closed_cards;
-      auto added_closed_cards   = card_set();
-      for (auto i = 0; i < removed_closed_cards.count(); ++i)
+      const auto removed_closed_cards = removed_cards & player.closed_cards;
+      auto       added_closed_cards   = card_set();
+      for (std::size_t i = 0; i < removed_closed_cards.count(); ++i)
         added_closed_cards.insert(table_->deck_.draw());
       player.closed_cards.erase (removed_closed_cards);
       player.closed_cards.insert(added_closed_cards);
 
-      auto removed_open_cards = removed_cards & player.open_cards;
-      auto added_open_cards   = card_set();
-      for (auto i = 0; i < removed_open_cards.count(); ++i)
+      const auto removed_open_cards = removed_cards & player.open_cards;
+      auto       added_open_cards   = card_set();
+      for (std::size_t i = 0; i < removed_open_cards.count(); ++i)
         added_open_cards.insert(table_->deck_.draw());
       player.open_cards.erase (removed_open_cards);
       player.open_cards.insert(added_open_cards);
@@ -313,6 +316,9 @@ protected:
   }
   void apply_increase_limit                   () const
   {
+    if (!table_->fixed_limit_ || !ruleset_->fixed_limits)
+      return;
+
     table_->fixed_limit_ = ruleset_->fixed_limits->big_bet;
     history_->back().push_back(event {event_type::increase_limit, std::nullopt, std::nullopt, ruleset_->fixed_limits->big_bet});
   }
@@ -335,7 +341,7 @@ protected:
           if (evaluations[index][1] > worst_evaluation) worst_evaluation = evaluations[index][1];
         });
 
-        auto winner_count = std::size_t(0);
+        auto winner_count = static_cast<std::size_t>(0);
         valid_players.iterate([&] (const std::size_t index)
         {
           if (evaluations[index][0] == best_evaluation || evaluations[index][1] == worst_evaluation) 
@@ -363,7 +369,7 @@ protected:
             best_evaluation = evaluations[index];
         });
 
-        auto winner_count = std::size_t(0);
+        auto winner_count = static_cast<std::size_t>(0);
         valid_players.iterate([&] (const std::size_t index)
         {
           if (evaluations[index] == best_evaluation) 
@@ -395,8 +401,6 @@ protected:
     table_->fixed_limit_    .reset  ();
   }
 
-  ruleset*                         ruleset_;
-  table*                           table_  ;
   std::vector<std::vector<event>>* history_;
 };
 }
