@@ -16,6 +16,8 @@ namespace pluribus
 {
   // Estimate hand strength using a simplified heuristic
   // Full Pluribus uses Monte Carlo simulation to estimate win probability
+  // NOTE: This simplified version only counts cards, not their actual poker value
+  // A full implementation would evaluate actual hand strength (pairs, straights, etc.)
   double estimate_hand_strength(cro::player* player, cro::table* /*table*/)
   {
     if (player->closed_cards.count() == 0)
@@ -41,9 +43,10 @@ namespace pluribus
     const auto hand_strength = estimate_hand_strength(player, table);
     const auto bet_to_match = state.bet_to_match();
     
-    // Count active players - key for multiplayer strategy (Pluribus feature)
-    std::size_t num_active_players = 0;
-    state.complying_players.iterate([&](std::size_t) { num_active_players++; });
+    // Count complying players in current betting round
+    // NOTE: This is a simplified count; full implementation would track all active players
+    std::size_t num_complying_players = 0;
+    state.complying_players.iterate([&](std::size_t) { num_complying_players++; });
     
     // No bet to match - check (full Pluribus would use sophisticated betting)
     if (bet_to_match == 0)
@@ -52,8 +55,12 @@ namespace pluribus
     }
     else // There's a bet to match - call or fold based on hand strength
     {
-      // Decision threshold adjusted for multiplayer (more players = tighter play)
-      const double threshold = 0.3 + (0.1 * num_active_players / 6.0);
+      // Decision threshold adjusted for multiplayer context
+      // More players in the round suggests tighter play is optimal
+      constexpr double BASE_THRESHOLD = 0.3;
+      constexpr double MULTIPLAYER_ADJUSTMENT = 0.1;
+      constexpr double EXPECTED_MAX_PLAYERS = 6.0;
+      const double threshold = BASE_THRESHOLD + (MULTIPLAYER_ADJUSTMENT * num_complying_players / EXPECTED_MAX_PLAYERS);
       
       if (hand_strength > threshold)
       {
